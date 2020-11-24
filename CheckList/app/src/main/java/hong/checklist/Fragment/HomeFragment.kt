@@ -1,5 +1,6 @@
 package hong.checklist.Fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.AsyncTask
 import android.os.Build
 import android.util.Log
 import android.view.Window
@@ -23,17 +25,25 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hong.checklist.*
+import hong.checklist.DB.CheckListDatabase
+import hong.checklist.DB.TodoContents
+import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.MyButtonClickListener
 import org.w3c.dom.Text
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.collections.toMutableList as toMutableList1
 
-class HomeFragment(context: Context) : Fragment(),
-    OnCheckListener {
+@SuppressLint("StaticFieldLeak")
+class HomeFragment(context: Context) : Fragment(), OnCheckListener {
+
+    lateinit var db : CheckListDatabase
+    var todoentityList = listOf<TodoEntity>()
 
     lateinit var formatted : String
-    var todoList = ArrayList<String>()
+    var todoList =ArrayList<TodoContents>()
+
     var update_check = false
     var count = 0
 
@@ -54,6 +64,8 @@ class HomeFragment(context: Context) : Fragment(),
         var tv_weather : TextView = view.findViewById(R.id.tv_weather)
         var tv_goal : TextView = view.findViewById(R.id.tv_goal)
 
+        db = CheckListDatabase.getInstance(requireContext())!!
+
         // Inflate the layout for this fragment
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val current =  LocalDateTime.now()
@@ -72,6 +84,10 @@ class HomeFragment(context: Context) : Fragment(),
         recyclerView_todo.layoutManager = manager
         recyclerView_todo.setHasFixedSize(true)
 
+        // 맨 처음 불러오기
+        getAllTodos(formatted)
+
+        // 스와이프해서 수정, 삭제
         val swipe = object : MySwipeHelper(context, recyclerView_todo, 200){
             override fun instantiateMyButton(
                 viewHolder: RecyclerView.ViewHolder,
@@ -90,6 +106,11 @@ class HomeFragment(context: Context) : Fragment(),
                                 setRecyclerView(todoList)
                                 et_today_todo.setText("")
                                 update_check = false
+
+                                // DB 저장
+                                val contentList : List<TodoContents> = todoList
+                                val todo = TodoEntity(formatted, contentList ,0)
+                                insertTodo(todo)
                             }
                         })
                 )
@@ -102,7 +123,7 @@ class HomeFragment(context: Context) : Fragment(),
                         object : MyButtonClickListener {
                             override fun onClick(pos: Int) {
                                 Log.d("클릭", "수정")
-                                et_today_todo.setText(todoList[pos])
+                                et_today_todo.setText(todoList[pos].content)
 
                                 // 키보드 올리기
                                 val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -112,6 +133,11 @@ class HomeFragment(context: Context) : Fragment(),
                                 )
                                 update_check = true
                                 count = pos
+
+                                // DB 저장
+                                val contentList : List<TodoContents> = todoList
+                                val todo = TodoEntity(formatted, contentList ,0)
+                                insertTodo(todo)
                             }
                         })
                 )
@@ -129,15 +155,21 @@ class HomeFragment(context: Context) : Fragment(),
                 }
                 else{
                     if(update_check){
-                        todoList.set(count,et_today_todo.text.toString())
+                        todoList.set(count,TodoContents(et_today_todo.text.toString(),todoList.get(count).check))
                         update_check = false
                     }
                     else{
-                        todoList.add(et_today_todo.text.toString())
+                        todoList.add(TodoContents(et_today_todo.text.toString(),0))
                     }
 
                     et_today_todo.setText("")
                     setRecyclerView(todoList)
+
+                    // DB 저장
+                    val contentList : List<TodoContents> = todoList
+                    val todo = TodoEntity(formatted, contentList ,0)
+                    insertTodo(todo)
+
                 }
 
                 // 키보드 내리기
@@ -186,7 +218,7 @@ class HomeFragment(context: Context) : Fragment(),
         return view
     }
 
-    fun setRecyclerView(todoList : ArrayList<String>){
+    fun setRecyclerView(todoList : ArrayList<TodoContents>){
 
         recyclerView_todo.adapter =
             TodoAdapter(context, todoList, this)
@@ -207,4 +239,52 @@ class HomeFragment(context: Context) : Fragment(),
                 tv_goal.setText("아직 $goal 개 남았다 !")
         }
     }
+
+    fun insertTodo(todo : TodoEntity){
+        // 1. MainThread vs WorkerThread(Background Thread)
+
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.todoDAO().insert(todo)
+            }
+        }
+
+        insertTask.execute()
+    }
+
+    fun getAllTodos(today: String){
+        val getTask = object : AsyncTask<Unit, Unit, Unit>(){
+            override fun doInBackground(vararg p0: Unit?) {
+                todoentityList = db.todoDAO().getContent(today)
+            }
+            // insert 한 후에
+            override fun onPostExecute(result: Unit?) {
+                super.onPostExecute(result)
+                if(todoentityList.size > 0) {
+                    todoList = todoentityList[0].contentList as ArrayList<TodoContents>
+                    setRecyclerView(todoList)
+                }
+            }
+        }
+
+        getTask.execute()
+    }
+
+    fun deleteTodo(todo : TodoEntity){
+        val deleteTask = object : AsyncTask<Unit, Unit, Unit>(){
+            override fun doInBackground(vararg p0: Unit?) {
+                TODO("Not yet implemented")
+                db.todoDAO().delete(todo)
+            }
+            // insert 한 후에
+            override fun onPostExecute(result: Unit?) {
+                super.onPostExecute(result)
+
+            }
+        }
+
+        deleteTask.execute()
+
+    }
+
 }

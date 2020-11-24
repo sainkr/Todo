@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import hong.checklist.DB.TodoContents
+import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.OnCheckListener
 import kotlinx.android.synthetic.main.item_checklist.view.*
 
-class TodoAdapter(val context : Context?, var list : ArrayList<String>, var onCheckListener: OnCheckListener) : RecyclerView.Adapter<TodoAdapter.MyViewHolder>(){
+class TodoAdapter(val context : Context?, var list : List<TodoContents>, var onCheckListener: OnCheckListener) : RecyclerView.Adapter<TodoAdapter.MyViewHolder>(){
 
     var count = 0;
 
@@ -31,7 +33,7 @@ class TodoAdapter(val context : Context?, var list : ArrayList<String>, var onCh
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val todo = list[position]
+        val todo = list[position].content
         var img = false
 
         holder.contents.text = todo
