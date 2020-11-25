@@ -34,30 +34,25 @@ class TodoAdapter(val context : Context?, var list : List<TodoContents>, var onC
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val todo = list[position].content
-        var img = false
 
         holder.contents.text = todo
 
+        if(list[position].check == 1)
+            holder.img_ck.setImageResource(R.drawable.check)
+
         holder.root.setOnClickListener(object : View.OnClickListener{
             override fun onClick(p0: View?) {
-                if(!img){
-                    holder.img_ck.setImageResource(R.drawable.check);
-                    count += 1
-                    img = true;
-                }
-                else{
-                    holder.img_ck.setImageResource(R.drawable.normal);
-                    if(count == 1)
-                        count = 0;
-                    else
-                        count -= 1
-                    img = false;
+                var check = 0
+                when(list[position].check){
+                    0 -> {
+                           holder.img_ck.setImageResource(R.drawable.check)
+                           check = 1
+                    }
+                    1 -> {holder.img_ck.setImageResource(R.drawable.normal) }
                 }
 
-                onCheckListener.onCheckListener(count)
-
+                onCheckListener.onCheckListener(position,check)
             }
         })
     }
 }
-

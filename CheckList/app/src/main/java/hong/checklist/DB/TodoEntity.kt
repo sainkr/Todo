@@ -13,6 +13,9 @@ data class TodoEntity (
     @ColumnInfo(name = "content_check")
     var contentList: List<TodoContents> ?= null,
 
+    @ColumnInfo(name = "weather")
+    var weather : Int,
+
     @ColumnInfo(name = "goal")
     var goal : Int
 )

@@ -45,8 +45,11 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
     var todoList =ArrayList<TodoContents>()
 
     var update_check = false
-    var count = 0
+    var update_position = 0
+    var weather = -1
+    var check_count = 0
 
+    var weatherarr = arrayOf("날씨 : 맑음","날씨 : 흐림","날씨 : 비","날씨 : 눈")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +65,10 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
         val recyclerView_todo: RecyclerView = view.findViewById(R.id.recyclerView_todo)
         val et_today_todo : EditText = view.findViewById(R.id.et_today_todo)
         var tv_weather : TextView = view.findViewById(R.id.tv_weather)
-        var tv_goal : TextView = view.findViewById(R.id.tv_goal)
 
         db = CheckListDatabase.getInstance(requireContext())!!
 
-        // Inflate the layout for this fragment
+        // 오늘 날짜
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val current =  LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일")
@@ -76,9 +78,9 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
             tv_date.setText("2020년 7월 30일")
         }
 
-        val manager = LinearLayoutManager(context)
 
         // recyclerview 역순으로 출력
+        val manager = LinearLayoutManager(context)
         manager.reverseLayout = true
         manager.stackFromEnd = true
         recyclerView_todo.layoutManager = manager
@@ -86,100 +88,6 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
 
         // 맨 처음 불러오기
         getAllTodos(formatted)
-
-        // 스와이프해서 수정, 삭제
-        val swipe = object : MySwipeHelper(context, recyclerView_todo, 200){
-            override fun instantiateMyButton(
-                viewHolder: RecyclerView.ViewHolder,
-                buffer: MutableList<MyButton>
-            ) {
-                buffer.add(
-                    MyButton(context!!,
-                        "삭제",
-                        50,
-                        0,
-                        Color.parseColor("#FFFFFF"),
-                        object : MyButtonClickListener {
-                            override fun onClick(pos: Int) {
-                                Log.d("클릭", "삭제")
-                                todoList.removeAt(pos)
-                                setRecyclerView(todoList)
-                                et_today_todo.setText("")
-                                update_check = false
-
-                                // DB 저장
-                                val contentList : List<TodoContents> = todoList
-                                val todo = TodoEntity(formatted, contentList ,0)
-                                insertTodo(todo)
-                            }
-                        })
-                )
-                buffer.add(
-                    MyButton(context!!,
-                        "수정",
-                        50,
-                        0,
-                        Color.parseColor("#000000"),
-                        object : MyButtonClickListener {
-                            override fun onClick(pos: Int) {
-                                Log.d("클릭", "수정")
-                                et_today_todo.setText(todoList[pos].content)
-
-                                // 키보드 올리기
-                                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                imm.toggleSoftInput(
-                                    InputMethodManager.SHOW_FORCED,
-                                    InputMethodManager.HIDE_IMPLICIT_ONLY
-                                )
-                                update_check = true
-                                count = pos
-
-                                // DB 저장
-                                val contentList : List<TodoContents> = todoList
-                                val todo = TodoEntity(formatted, contentList ,0)
-                                insertTodo(todo)
-                            }
-                        })
-                )
-            }
-
-        }
-
-        // edittext 완료 시 list 추가
-        et_today_todo.setOnEditorActionListener{ textView, action, event ->
-            var handled = false
-
-            if (action == EditorInfo.IME_ACTION_DONE) {
-                if(et_today_todo.text.toString().equals("")){
-                    Toast.makeText(requireContext(), "오늘 할 일을 입력해주세요.",Toast.LENGTH_SHORT).show()
-                }
-                else{
-                    if(update_check){
-                        todoList.set(count,TodoContents(et_today_todo.text.toString(),todoList.get(count).check))
-                        update_check = false
-                    }
-                    else{
-                        todoList.add(TodoContents(et_today_todo.text.toString(),0))
-                    }
-
-                    et_today_todo.setText("")
-                    setRecyclerView(todoList)
-
-                    // DB 저장
-                    val contentList : List<TodoContents> = todoList
-                    val todo = TodoEntity(formatted, contentList ,0)
-                    insertTodo(todo)
-
-                }
-
-                // 키보드 내리기
-                val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(et_today_todo.windowToken, 0)
-                handled = true
-            }
-
-            handled
-        }
 
         // 날씨 선택
         tv_weather.setOnClickListener{
@@ -196,53 +104,131 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
             var btn_weather4 : Button = dialog.findViewById(R.id.btn_weather4)
 
             btn_weather1.setOnClickListener{
-                tv_weather.setText("날씨 : 맑음")
+                tv_weather.setText(weatherarr[0])
+                weather = 0
+                saveDB()
                 dialog.dismiss()
             }
             btn_weather2.setOnClickListener{
-                tv_weather.setText("날씨 : 흐림")
+                tv_weather.setText(weatherarr[1])
+                weather = 1
+                saveDB()
                 dialog.dismiss()
             }
             btn_weather3.setOnClickListener{
-                tv_weather.setText("날씨 : 비")
+                tv_weather.setText(weatherarr[2])
+                weather = 2
+                saveDB()
                 dialog.dismiss()
             }
             btn_weather4.setOnClickListener{
-                tv_weather.setText("날씨 : 눈")
+                tv_weather.setText(weatherarr[3])
+                weather = 3
+                saveDB()
                 dialog.dismiss()
             }
 
             dialog.show()
         }
 
+        // 스와이프해서 수정, 삭제
+        val swipe = object : MySwipeHelper(context, recyclerView_todo, 200){
+            override fun instantiateMyButton(
+                viewHolder: RecyclerView.ViewHolder,
+                buffer: MutableList<MyButton>
+            ) {
+                buffer.add(
+                    MyButton(context!!,
+                        "삭제",
+                        50,
+                        0,
+                        Color.parseColor("#FFFFFF"),
+                        object : MyButtonClickListener {
+                            override fun onClick(pos: Int) {
+
+                                todoList.removeAt(pos)
+                                setRecyclerView(todoList)
+                                et_today_todo.setText("")
+                                update_check = false
+
+                                //DB 저장
+                                saveDB()
+                            }
+                        })
+                )
+                buffer.add(
+                    MyButton(context!!,
+                        "수정",
+                        50,
+                        0,
+                        Color.parseColor("#000000"),
+                        object : MyButtonClickListener {
+                            override fun onClick(pos: Int) {
+
+                                et_today_todo.setText(todoList[pos].content)
+
+                                // 키보드 올리기
+                                val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                imm.toggleSoftInput(
+                                    InputMethodManager.SHOW_FORCED,
+                                    InputMethodManager.HIDE_IMPLICIT_ONLY
+                                )
+                                update_check = true
+                                update_position = pos
+
+                            }
+                        })
+                )
+            }
+
+        }
+
+        // edittext 완료 시 list 추가
+        et_today_todo.setOnEditorActionListener{ textView, action, event ->
+            var handled = false
+
+            if (action == EditorInfo.IME_ACTION_DONE) {
+                if(et_today_todo.text.toString().equals("")){
+                    Toast.makeText(requireContext(), "오늘 할 일을 입력해주세요.",Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    if(update_check){ // 수정하고 확인 눌렀을 때
+                        todoList.set(update_position,TodoContents(et_today_todo.text.toString(),todoList.get(update_position).check))
+                        update_check = false
+                    }
+                    else{
+                        todoList.add(TodoContents(et_today_todo.text.toString(),0))
+                    }
+
+                    et_today_todo.setText("")
+                    setRecyclerView(todoList)
+
+                    //DB 저장
+                    saveDB()
+                }
+
+                // 키보드 내리기
+                val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(et_today_todo.windowToken, 0)
+                handled = true
+            }
+
+            handled
+        }
         return view
     }
 
-    fun setRecyclerView(todoList : ArrayList<TodoContents>){
-
+    fun setRecyclerView(todoList : List<TodoContents>){
         recyclerView_todo.adapter =
             TodoAdapter(context, todoList, this)
-
     }
 
-    override fun onCheckListener(count: Int) {
-        val count_all = recyclerView_todo.adapter?.getItemCount() ?: 0
-        if(count == 0){
-            tv_goal.setText("빨리 시작해 .. ~")
-        }
-        else{
-            // val goal = ( (count * 100 ) / count_all)
-            val goal = count_all - count
-            if(goal == 0)
-                tv_goal.setText("오늘할거 다했다 !")
-            else
-                tv_goal.setText("아직 $goal 개 남았다 !")
-        }
+    override fun onCheckListener(position: Int,check : Int) {
+        todoList.set(position,TodoContents(todoList.get(position).content,check))
+        saveDB()
     }
 
-    fun insertTodo(todo : TodoEntity){
-        // 1. MainThread vs WorkerThread(Background Thread)
-
+    fun setTodo(todo : TodoEntity){
         val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg p0: Unit?) {
                 db.todoDAO().insert(todo)
@@ -260,9 +246,23 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
             // insert 한 후에
             override fun onPostExecute(result: Unit?) {
                 super.onPostExecute(result)
-                if(todoentityList.size > 0) {
-                    todoList = todoentityList[0].contentList as ArrayList<TodoContents>
-                    setRecyclerView(todoList)
+                if(todoentityList.size > 0){
+                    val list = todoentityList[0].contentList
+                    weather = todoentityList[0].weather
+
+                    // 날씨 설정
+                    if(weather > -1)
+                        tv_weather.setText(weatherarr[weather])
+
+                    if(list!= null){
+                        var count = list.size - 1
+                        for(i in 0..count) {
+                            todoList.add(TodoContents(list[i].content, list[i].check))
+                            if(list[i].check == 1)
+                                check_count++
+                        }
+                        setRecyclerView(todoList)
+                    }
                 }
             }
         }
@@ -270,21 +270,12 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
         getTask.execute()
     }
 
-    fun deleteTodo(todo : TodoEntity){
-        val deleteTask = object : AsyncTask<Unit, Unit, Unit>(){
-            override fun doInBackground(vararg p0: Unit?) {
-                TODO("Not yet implemented")
-                db.todoDAO().delete(todo)
-            }
-            // insert 한 후에
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-
-            }
-        }
-
-        deleteTask.execute()
-
+    fun saveDB(){
+        // DB 저장
+        val contentList : List<TodoContents> = todoList
+        Log.d("날씨 저장",weather.toString())
+        val todo = TodoEntity(formatted, contentList ,weather,0)
+        setTodo(todo)
     }
 
 }
