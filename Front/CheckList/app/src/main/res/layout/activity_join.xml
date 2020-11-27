@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="MissingDefaultResource">
+
+    <EditText
+        android:id="@+id/et_join_name"
+        android:background="@drawable/edittext_login_background"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="100dp"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:hint="     이름"
+        android:textColor="@color/black"
+        android:textCursorDrawable="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/et_join_id"
+        android:background="@drawable/edittext_login_background"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:hint="     이메일"
+        android:textColor="@color/black"
+        android:textCursorDrawable="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_join_name"/>
+
+    <EditText
+        android:id="@+id/et_join_password"
+        android:background="@drawable/edittext_login_background"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:inputType="textPassword"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:hint="     비밀번호"
+        android:textColor="@color/black"
+        android:textCursorDrawable="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_join_id"/>
+
+    <Button
+        android:id="@+id/btn_join"
+        android:background="@drawable/btn_login_background"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:text="가입하기"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_join_password"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
