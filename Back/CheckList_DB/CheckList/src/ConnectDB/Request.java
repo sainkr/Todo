@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Login {
+public class Request {
 	
-	private static Login instance = new Login();
+	private static Request instance = new Request();
 
-	public static Login getInstance() {
+	public static Request getInstance() {
 		return instance;
 	}
 	
@@ -25,20 +25,20 @@ public class Login {
 	private String returns;
 	
 	
-	public String addProfile(String id, String password, String name) {
+	public String addRequest(String request_id, String target_id) {
 		
-		  if(getProfile(id,password).equals("loginFail")) {
+		  if(getProfile(target_id).equals("loginSuccess")) {
 			  try {
 					conn = cDB.getConn();
 					
-					sql = "insert into profile (id, password, name) values (?, ?, ?)";
+					sql = "insert into request_friend (request_id, target_id) values (?, ?)";
 					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, id);
-					pstmt.setString(2, password);
-					pstmt.setString(3, name);
+					pstmt.setString(1, request_id);
+					pstmt.setString(2, target_id);
+					
 					pstmt.executeUpdate();	//	db에 쿼리문 입력
 					
-					returns = "joinSuccess";
+					returns = "requestSuccess";
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					System.err.println("Login SQLException error");
@@ -70,25 +70,22 @@ public class Login {
 				System.out.println(returns);
 		  }
 		  else
-			  returns = "joinFail";
+			  returns = "requestFail";
 			
 		return returns;
 	}
 	
-	
-	public String getProfile(String id, String password) {	
+	public String getProfile(String id) {	
 		try {
-			System.out.println("id : " + id + " password : " + password);
+
 			conn = cDB.getConn();
-			sql = "select * from profile where id =? and password = ?";
+			sql = "select * from profile where id =?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
-			pstmt.setString(2, password);
 			rs = pstmt.executeQuery();		
 
-			
 			if(rs.next()) 
-				returns = rs.getString("name");
+				returns = "loginSuccess";
 			else
 				returns = "loginFail";
 			

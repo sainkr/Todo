@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import hong.checklist.AddFriendActivity
 import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.ProfileEntity
 import hong.checklist.LoginActivity
@@ -37,23 +38,26 @@ class ProfileFragment : Fragment(){
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         var tv_name : TextView= view.findViewById(R.id.tv_name)
+        var tv_freindadd : TextView = view.findViewById(R.id.tv_profile_freindadd)
 
         db = CheckListDatabase.getInstance(requireContext())!!
 
+        getProfile()
+
         tv_name.setOnClickListener{
             Log.d("로그인",login_success.toString())
-
-            if(login_success){
-                tv_name.setText(profileList[0].name)
-                tv_name.setTextColor(Color.parseColor("#000000"))
-            }
-            else{
+            Log.d("이름",profileList[0].name)
+            if(!login_success){
                 val intent = Intent(requireContext(), LoginActivity::class.java)
                 startActivity(intent)
             }
         }
 
-        getProfile()
+        tv_freindadd.setOnClickListener{
+            val intent = Intent(requireContext(),AddFriendActivity::class.java)
+            intent.putExtra("my_id",profileList[0].id)
+            startActivity(intent)
+        }
 
         return view
     }
@@ -68,6 +72,8 @@ class ProfileFragment : Fragment(){
                 super.onPostExecute(result)
                 if(profileList.size > 0){
                     login_success = true
+                    tv_name.setText(profileList[0].name)
+                    tv_name.setTextColor(Color.parseColor("#000000"))
                 }
             }
         }

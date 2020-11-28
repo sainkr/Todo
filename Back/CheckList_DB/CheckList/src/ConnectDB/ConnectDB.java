@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class ConnectDB {
 
-	String dbURL = "jdbc:mysql://192.168.35.135:3306/todo_db"; // MySQL 계정
+	String dbURL = "jdbc:mysql://192.168.35.135:3306/checklist_db"; // MySQL 계정
 	String dbID = "root"; // MySQL 계정
 	String dbPW = "1234";
 	

@@ -31,6 +31,8 @@
         <activity android:name=".JoinActivity">
         </activity>
 
+        <activity android:name=".AddFriendActivity">
+        </activity>
 
     </application>
 

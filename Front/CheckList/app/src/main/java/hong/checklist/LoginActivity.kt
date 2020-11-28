@@ -1,7 +1,9 @@
 package hong.checklist
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,16 +12,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import hong.checklist.DB.CheckListDatabase
+import hong.checklist.DB.ProfileEntity
 import kotlinx.android.synthetic.main.activity_login.*
 
+@SuppressLint("StaticFieldLeak")
 class LoginActivity : AppCompatActivity() {
 
     val url_login = "http://192.168.35.135:8080/CheckList/Login.jsp"
-
+    lateinit var db : CheckListDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        db = CheckListDatabase.getInstance(this)!!
 
         tv_findpassword.setOnClickListener{
 
@@ -45,6 +52,16 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    fun insertProfile(profile: ProfileEntity) {
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.profileDAO().insert(profile)
+            }
+        }
+
+        insertTask.execute()
+    }
+
     private fun loginVolley(
         context: Context,
         url: String,
@@ -54,16 +71,21 @@ class LoginActivity : AppCompatActivity() {
 
         // 1. RequestQueue 생성 및 초기화
         var requestQueue = Volley.newRequestQueue(this)
-        // https://developer.android.com/training/volley/simple GET 방법
 
         // 2. Request Obejct인 StringRequest 생성
         val request: StringRequest = object : StringRequest(
             Method.POST, url,
             Response.Listener { response ->
-                when(response){
-                    "loginFail" -> {Toast.makeText(context, "로그인 실패..", Toast.LENGTH_LONG).show()}
-                    "loingSuccess" -> { Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
-                        finish()}
+                if(response.equals("loginFail")){
+                    Toast.makeText(context, "로그인 실패..", Toast.LENGTH_LONG).show()
+                }
+                else if(response.equals("error")){
+
+                }
+                else{
+                    Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
+                    insertProfile(ProfileEntity(id, password, response)) // 내부 db 저장
+                    finish()
                 }
             },
             Response.ErrorListener { error ->
