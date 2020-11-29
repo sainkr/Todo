@@ -1,11 +1,11 @@
-package hong.checklist
+package hong.checklist.Adapter
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_checklist.view.*
+import hong.checklist.R
 import kotlinx.android.synthetic.main.item_day.view.*
 
 class CalendarAdapter(val context: Context, val list : ArrayList<String>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {

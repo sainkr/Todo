@@ -14,7 +14,9 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.ProfileEntity
+import hong.checklist.DB.TodoContents
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 @SuppressLint("StaticFieldLeak")
 class LoginActivity : AppCompatActivity() {
@@ -56,6 +58,7 @@ class LoginActivity : AppCompatActivity() {
         val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg p0: Unit?) {
                 db.profileDAO().insert(profile)
+
             }
         }
 
@@ -85,6 +88,9 @@ class LoginActivity : AppCompatActivity() {
                 else{
                     Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
                     insertProfile(ProfileEntity(id, password, response)) // 내부 db 저장
+                    val intentR = intent
+                    intentR.putExtra("name" , response);
+                    setResult(RESULT_OK,intentR); //결과를 저장
                     finish()
                 }
             },

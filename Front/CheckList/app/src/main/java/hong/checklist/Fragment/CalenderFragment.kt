@@ -1,16 +1,13 @@
 package hong.checklist.Fragment
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import hong.checklist.CalendarAdapter
+import hong.checklist.Adapter.CalendarAdapter
 import hong.checklist.R
-import hong.checklist.TodoAdapter
-import kotlinx.android.synthetic.main.fragment_calender.*
 import java.util.*
 import kotlin.collections.ArrayList
 import android.content.Context
@@ -44,7 +41,8 @@ class CalenderFragment(context: Context) : Fragment() {
             calendarList.add(j.toString()); //일자 타입
         }
 
-        recyclerView_calendar.adapter = CalendarAdapter(context!!, calendarList)
+        recyclerView_calendar.adapter =
+            CalendarAdapter(context!!, calendarList)
         recyclerView_calendar.layoutManager = StaggeredGridLayoutManager(7, StaggeredGridLayoutManager.VERTICAL)
 
         return view

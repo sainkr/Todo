@@ -25,15 +25,14 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hong.checklist.*
+import hong.checklist.Adapter.TodoAdapter
 import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.TodoContents
 import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.MyButtonClickListener
-import org.w3c.dom.Text
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.toMutableList as toMutableList1
 
 @SuppressLint("StaticFieldLeak")
 class HomeFragment(context: Context) : Fragment(), OnCheckListener {

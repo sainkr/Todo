@@ -15,25 +15,24 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class AddFriendActivity : AppCompatActivity() {
 
-    val url_request = "http://192.168.35.135:8080/CheckList/Request.jsp"
-
+    val url_request = "http://192.168.35.135:8080/CheckList/Friend.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_addfrined)
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_addfrined)
 
-        val intent = intent
-        val my_id = intent.getStringExtra("my_id")
+    val intent = intent
+    val my_id = intent.getStringExtra("my_id")
 
-        btn_friendadd.setOnClickListener {
-            if(et_frined_id.text.toString().equals(""))
-                Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_LONG).show()
-            else{
-                Log.d("진입","!")
-                requestfrinedVolley(this,url_request,my_id,et_frined_id.text.toString())
-            }
+    btn_friendadd.setOnClickListener {
+        if(et_frined_id.text.toString().equals(""))
+            Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_LONG).show()
+        else{
+            Log.d("진입","!")
+            requestfrinedVolley(this,url_request,my_id,et_frined_id.text.toString())
         }
     }
+}
 
     private fun requestfrinedVolley(
         context: Context,
@@ -49,7 +48,6 @@ class AddFriendActivity : AppCompatActivity() {
         val request: StringRequest = object : StringRequest(
             Method.POST, url,
             Response.Listener { response ->
-                Log.d("진입","3")
                 when(response){
                     "requestFail" -> {Toast.makeText(context, "존재하지 않는 ID 입니다.", Toast.LENGTH_LONG).show()}
                     "requestSuccess" -> { Toast.makeText(this,"친구신청 성공",Toast.LENGTH_LONG).show()
@@ -62,7 +60,7 @@ class AddFriendActivity : AppCompatActivity() {
         ) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                Log.d("진입","2")
+                params["type"]= "addFriend"
                 params["my_id"] = my_id
                 params["frined_id"] = friend_id
 

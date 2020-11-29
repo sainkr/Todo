@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Request {
+public class Friend {
 	
-	private static Request instance = new Request();
+	private static Friend instance = new Friend();
 
-	public static Request getInstance() {
+	public static Friend getInstance() {
 		return instance;
 	}
 	
@@ -22,6 +22,7 @@ public class Request {
 	private String sql = "";
 	private PreparedStatement pstmt;
 	private ResultSet rs;	
+	private ResultSet rs_sub;
 	private String returns;
 	
 	
@@ -72,6 +73,82 @@ public class Request {
 		  else
 			  returns = "requestFail";
 			
+		return returns;
+	}
+	
+	public String getRequest(String request_id) {
+		System.out.println("내 아이디"+ request_id);
+		
+	  try {
+			conn = cDB.getConn();
+			
+			sql = "select * from request_friend where target_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, request_id);
+			rs = pstmt.executeQuery();			
+			
+			JSONArray jary = new JSONArray();
+			while(rs.next()) {
+				sql = "select * from profile where id = ?";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, rs.getString("request_id"));
+				rs_sub = pstmt.executeQuery();	
+			
+				while(rs_sub.next()) {
+					JSONObject jobj = new JSONObject();
+					jobj.put("id",rs.getString("request_id"));
+					jobj.put("name",rs_sub.getString("name"));
+					jary.add(jobj);
+				}
+				
+				sql = "delete from request_friend where num = ?";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, rs.getString("num"));
+				pstmt.executeUpdate();
+			}
+			
+			if(jary.size() == 0)
+				returns = "requstNoting";
+			else
+				returns = jary.toJSONString();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println(e);
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs_sub != null)
+				try {
+					rs_sub.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+		}
+		
+		System.out.println(returns);
+	
 		return returns;
 	}
 	

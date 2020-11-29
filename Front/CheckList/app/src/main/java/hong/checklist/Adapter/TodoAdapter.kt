@@ -1,4 +1,4 @@
-package hong.checklist
+package hong.checklist.Adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import hong.checklist.DB.TodoContents
-import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.OnCheckListener
+import hong.checklist.R
 import kotlinx.android.synthetic.main.item_checklist.view.*
 
 class TodoAdapter(val context : Context?, var list : List<TodoContents>, var onCheckListener: OnCheckListener) : RecyclerView.Adapter<TodoAdapter.MyViewHolder>(){
