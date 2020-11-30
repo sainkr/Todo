@@ -5,12 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import hong.checklist.DB.ChallengeFriendContents
 import hong.checklist.DB.TodoContents
 import hong.checklist.Listener.OnCheckListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.item_checklist.view.*
 
-class TodoAdapter(val context : Context?, var list : List<TodoContents>, var onCheckListener: OnCheckListener) : RecyclerView.Adapter<TodoAdapter.MyViewHolder>(){
+class ChallengeFriendAdapter(val context : Context?, var list : List<ChallengeFriendContents>, var onCheckListener: OnCheckListener) : RecyclerView.Adapter<ChallengeFriendAdapter.MyViewHolder>(){
 
     // 정의 해주는
     inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -31,7 +32,7 @@ class TodoAdapter(val context : Context?, var list : List<TodoContents>, var onC
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val todo = list[position].content
+        val todo = list[position].name
 
         holder.contents.text = todo
 

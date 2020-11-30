@@ -25,6 +25,9 @@
         <activity android:name=".ChallengeActivity">
         </activity>
 
+        <activity android:name=".ChallengePlusActivity">
+        </activity>
+
         <activity android:name=".LoginActivity">
         </activity>
 

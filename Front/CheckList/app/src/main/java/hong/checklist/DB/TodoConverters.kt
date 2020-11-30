@@ -3,7 +3,7 @@ package hong.checklist.DB
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 
-class Converters {
+class TodoConverters {
 
     @TypeConverter
     fun listToJson(value: List<TodoContents>?) = Gson().toJson(value)

@@ -35,6 +35,10 @@ import org.json.JSONException
 @SuppressLint("StaticFieldLeak")
 class ProfileFragment : Fragment(){
 
+    // 놓친 부분
+    // 1. 친구 닉네임 동기화.
+    // 2. 친구 삭제
+
     lateinit var db : CheckListDatabase
     var profileList = listOf<ProfileEntity>()
     var friendentityList = listOf<FriendEntity>()
@@ -126,6 +130,16 @@ class ProfileFragment : Fragment(){
         getTask.execute()
     }
 
+    fun insertFriend(friend : FriendEntity){
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.friendDAO().insert(friend)
+            }
+        }
+
+        insertTask.execute()
+    }
+
     private fun friendVolley(
         context: Context,
         url: String,
@@ -180,15 +194,6 @@ class ProfileFragment : Fragment(){
         requestQueue.add(request)
     }
 
-    fun insertFriend(friend : FriendEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.friendDAO().insert(friend)
-            }
-        }
-
-        insertTask.execute()
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

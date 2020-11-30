@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = arrayOf(TodoEntity::class, FriendEntity::class, ProfileEntity::class), version = 1)
-@TypeConverters(Converters::class)
+@Database(entities = arrayOf(TodoEntity::class, FriendEntity::class, ProfileEntity::class, ChallengeEntity::class ), version = 2)
+@TypeConverters(TodoConverters::class, ChallengeConverters::class)
 abstract class CheckListDatabase : RoomDatabase() {
     abstract fun todoDAO() : TodoDAO
     abstract fun friendDAO() : FriendDAO
     abstract fun profileDAO() : ProfileDAO
+    abstract fun challengeDAO() : ChallengeDAO
 
     companion object{
         var INSTANCE : CheckListDatabase?= null
