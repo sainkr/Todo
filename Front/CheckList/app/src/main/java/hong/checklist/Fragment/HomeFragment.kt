@@ -41,7 +41,7 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
     var todoentityList = listOf<TodoEntity>()
 
     lateinit var formatted : String
-    var todoList =ArrayList<TodoContents>()
+    var todoList = ArrayList<TodoContents>()
 
     var update_check = false
     var update_position = 0

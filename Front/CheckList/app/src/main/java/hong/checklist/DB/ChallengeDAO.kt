@@ -12,4 +12,7 @@ interface ChallengeDAO {
 
     @Query("SELECT * FROM challenge")
     fun getChallenge() : List<ChallengeEntity>
+
+    @Query("SELECT * FROM challenge WHERE code = :num")
+    fun getChallenge(num: Int) : List<ChallengeEntity>
 }

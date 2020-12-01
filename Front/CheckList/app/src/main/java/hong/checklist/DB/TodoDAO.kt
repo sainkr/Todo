@@ -11,6 +11,9 @@ interface TodoDAO {
     @Insert(onConflict = REPLACE) // 기본키가 똑같으면 덮어 쓴다
     fun insert(todo : TodoEntity)
 
+    @Query("SELECT * FROM todo")
+    fun getContent() : List<TodoEntity>
+
     @Query("SELECT * FROM todo WHERE date = :today")
     fun getContent(today: String) : List<TodoEntity>
 

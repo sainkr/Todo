@@ -194,14 +194,12 @@ class ProfileFragment : Fragment(){
         requestQueue.add(request)
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(requestCode == REQUEST_CODE){
             if(resultCode != Activity.RESULT_OK)
                 return
-
             tv_name.setText(data?.extras?.getString("name"))
             tv_name.setTextColor(Color.parseColor("#000000"))
         }

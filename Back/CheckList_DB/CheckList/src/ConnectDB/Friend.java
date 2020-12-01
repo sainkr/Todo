@@ -36,8 +36,52 @@ public class Friend {
 					pstmt = conn.prepareStatement(sql);
 					pstmt.setString(1, request_id);
 					pstmt.setString(2, target_id);
-					
 					pstmt.executeUpdate();	//	db에 쿼리문 입력
+					
+					// 친구 추가
+					sql = "select * from profile where id = ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, request_id);
+					rs = pstmt.executeQuery();	//	db에 쿼리문 입력
+					if(rs.next()) {
+						String friend_id = rs.getString("friend_id");
+						if(friend_id == null) {
+							friend_id = target_id;
+						}
+						else {
+							friend_id += " "+ target_id;
+						}
+						
+						sql = "update profile set friend_id = ? where id = ?";
+						pstmt = conn.prepareStatement(sql);
+						pstmt.setString(1, friend_id);
+						pstmt.setString(2, request_id);
+						pstmt.executeUpdate();	//	db에 쿼리문 입력
+						
+					}
+					
+					// 친구 추가
+					sql = "select * from profile where id = ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, target_id);
+					rs = pstmt.executeQuery();	//	db에 쿼리문 입력
+					if(rs.next()) {
+						String friend_id = rs.getString("friend_id");
+						if(friend_id == null) {
+							friend_id = request_id;
+						}
+						else {
+							friend_id += " "+ request_id;
+						}
+						
+						sql = "update profile set friend_id = ? where id = ?";
+						pstmt = conn.prepareStatement(sql);
+						pstmt.setString(1, friend_id);
+						pstmt.setString(2, target_id);
+						pstmt.executeUpdate();	//	db에 쿼리문 입력
+						
+					}
+					
 					
 					returns = "requestSuccess";
 				} catch (SQLException e) {

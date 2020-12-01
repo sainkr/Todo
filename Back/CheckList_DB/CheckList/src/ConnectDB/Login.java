@@ -22,6 +22,7 @@ public class Login {
 	private String sql = "";
 	private PreparedStatement pstmt;
 	private ResultSet rs;	
+	private ResultSet rs_sub;	
 	private String returns;
 	
 	
@@ -39,6 +40,8 @@ public class Login {
 					pstmt.executeUpdate();	//	db에 쿼리문 입력
 					
 					returns = "joinSuccess";
+				
+					
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					System.err.println("Login SQLException error");
@@ -86,9 +89,31 @@ public class Login {
 			pstmt.setString(2, password);
 			rs = pstmt.executeQuery();		
 
-			
-			if(rs.next()) 
-				returns = rs.getString("name");
+			if(rs.next()) {
+				JSONArray jary = new JSONArray();
+				String friend_id = rs.getString("friend_id");
+				String[] arr = friend_id.split(" ");
+				
+				for(int i =0; i<arr.length; i++) {
+					
+					sql = "select * from profile where id = ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, arr[i]);
+					rs_sub = pstmt.executeQuery();	
+					
+					JSONObject jobj = new JSONObject();
+					jobj.put("name",rs.getString("name"));
+					jobj.put("id",arr[i]);
+					jobj.put("name",rs_sub.getString("name"));
+					jary.add(jobj);
+				}
+				
+				if(jary.size() == 0)
+					returns = rs.getString("name");
+				else
+					returns = jary.toJSONString();
+	
+			}
 			else
 				returns = "loginFail";
 			
@@ -115,6 +140,13 @@ public class Login {
 			if (rs != null)
 				try {
 					rs.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs_sub != null)
+				try {
+					rs_sub.close();
 				} catch (SQLException ex) {
 					System.err.println("Login SQLException error");
 					returns = "error";

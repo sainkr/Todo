@@ -32,7 +32,6 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
     var friendList = ArrayList<ChallengeFriendContents>()
     var check_list = ArrayList<Int>()
 
-
     val url_challenge = "http://192.168.35.135:8080/CheckList/Challenge.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,6 +110,22 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
         getTask.execute()
     }
 
+    fun addChallenge(challenge : ChallengeEntity){
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.challengeDAO().insert(challenge)
+            }
+            override fun onPostExecute(result: Unit?) {
+                super.onPostExecute(result)
+                val intentR = intent
+                setResult(RESULT_OK,intentR); //결과를 저장
+                finish()
+            }
+        }
+
+        insertTask.execute()
+    }
+
     private fun addVolley(
         context: Context,
         url: String,
@@ -124,8 +139,13 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
         // 2. Request Obejct인 StringRequest 생성
         val request: StringRequest = object : StringRequest(Method.POST, url,
             Response.Listener { response ->
-                when(response){
-                    "addChallengeSuccess" -> {Toast.makeText(context, "챌린지 추가 성공", Toast.LENGTH_LONG).show()}
+                if(response.equals("error")){
+
+                }
+                else{
+                    var list = ArrayList<ChallengeContents>()
+
+                    addChallenge(ChallengeEntity(response.toInt(),name,1, list))
                 }
             },
             Response.ErrorListener { error ->

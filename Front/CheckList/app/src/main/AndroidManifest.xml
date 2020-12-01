@@ -22,10 +22,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ChallengeActivity">
+        <activity android:name=".ChallengePlusActivity">
         </activity>
 
-        <activity android:name=".ChallengePlusActivity">
+        <activity android:name=".ChallengeHostActivity">
+        </activity>
+
+        <activity android:name=".ChallengeMemberActivity">
         </activity>
 
         <activity android:name=".LoginActivity">
