@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hong.checklist.Adapter.ChallengenameAdapter
@@ -19,6 +20,8 @@ import hong.checklist.ChallengeMemberActivity
 import hong.checklist.ChallengePlusActivity
 import hong.checklist.DB.ChallengeEntity
 import hong.checklist.DB.CheckListDatabase
+import hong.checklist.DB.FriendEntity
+import hong.checklist.DB.ProfileEntity
 import hong.checklist.Listener.OnChallengeTouchListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.fragment_challenge.*
@@ -30,7 +33,9 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
 
     lateinit var db : CheckListDatabase
     var challengeentityList = listOf<ChallengeEntity>()
+    var profileList = listOf<ProfileEntity>()
 
+    var my_id:String =""
     var challengeList = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +53,7 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
 
         db = CheckListDatabase.getInstance(requireContext())!!
 
+        getProfile()
         getChallenge()
 
         val manager = LinearLayoutManager(context)
@@ -55,8 +61,14 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
         recyclerView_challengename.setHasFixedSize(true)
 
         tv_challengeplus.setOnClickListener {
-            val intent = Intent(requireContext(), ChallengePlusActivity::class.java)
-            startActivityForResult(intent,REQUEST_CODE)
+            if(my_id.equals("")){
+                Toast.makeText(requireContext(), "로그인이 필요한 서비스입니다.", Toast.LENGTH_LONG).show()
+            }
+            else{
+                val intent = Intent(requireContext(), ChallengePlusActivity::class.java)
+                intent.putExtra("host_id",my_id)
+                startActivityForResult(intent,REQUEST_CODE)
+            }
         }
         return view
     }
@@ -71,6 +83,7 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
             val intent = Intent(requireContext(), ChallengeHostActivity::class.java)
             intent.putExtra("code",challengeentityList.get(position).code)
             intent.putExtra("name",challengeentityList.get(position).name)
+            intent.putExtra("my_id",my_id)
             // intent.putParcelableArrayListExtra("challengeeentityList",challengeentityList )
             startActivity(intent)
         }
@@ -78,9 +91,27 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
             val intent = Intent(requireContext(), ChallengeMemberActivity::class.java)
             intent.putExtra("code",challengeentityList.get(position).code)
             intent.putExtra("name",challengeentityList.get(position).name)
+            intent.putExtra("my_id",my_id)
             startActivity(intent)
         }
     }
+
+    fun getProfile() {
+        val getTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                profileList = db.profileDAO().getProfile()
+            }
+
+            override fun onPostExecute(result: Unit?) {
+                super.onPostExecute(result)
+                if (profileList.size > 0) {
+                    my_id = profileList.get(0).id
+                }
+            }
+        }
+        getTask.execute()
+    }
+
 
     fun getChallenge(){
         val insertTask = object : AsyncTask<Unit, Unit, Unit>() {

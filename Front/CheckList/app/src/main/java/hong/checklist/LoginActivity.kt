@@ -13,16 +13,21 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import hong.checklist.DB.CheckListDatabase
+import hong.checklist.DB.FriendEntity
 import hong.checklist.DB.ProfileEntity
 import hong.checklist.DB.TodoContents
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import org.json.JSONArray
+import org.json.JSONException
 
 @SuppressLint("StaticFieldLeak")
 class LoginActivity : AppCompatActivity() {
 
     val url_login = "http://192.168.35.135:8080/CheckList/Login.jsp"
     lateinit var db : CheckListDatabase
+
+    var friendentityList = listOf<FriendEntity>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,34 +70,67 @@ class LoginActivity : AppCompatActivity() {
         insertTask.execute()
     }
 
+    fun insertFriend(friend : FriendEntity){
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.friendDAO().insert(friend)
+            }
+        }
+
+        insertTask.execute()
+    }
+
     private fun loginVolley(
         context: Context,
-        url: String,
-        id: String,
-        password: String
-    ) {
+                url: String,
+                id: String,
+                password: String
+                ) {
 
-        // 1. RequestQueue 생성 및 초기화
-        var requestQueue = Volley.newRequestQueue(this)
+                // 1. RequestQueue 생성 및 초기화
+                var requestQueue = Volley.newRequestQueue(this)
 
-        // 2. Request Obejct인 StringRequest 생성
-        val request: StringRequest = object : StringRequest(
-            Method.POST, url,
-            Response.Listener { response ->
-                if(response.equals("loginFail")){
-                    Toast.makeText(context, "로그인 실패..", Toast.LENGTH_LONG).show()
-                }
-                else if(response.equals("error")){
+                // 2. Request Obejct인 StringRequest 생성
+                val request: StringRequest = object : StringRequest(
+                    Method.POST, url,
+                    Response.Listener { response ->
+                        if(response.equals("loginFail")){
+                            Toast.makeText(context, "로그인 실패..", Toast.LENGTH_LONG).show()
+                        }
+                        else if(response.equals("error")){
 
-                }
-                else{
-                    Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
-                    insertProfile(ProfileEntity(id, password, response)) // 내부 db 저장
-                    val intentR = intent
-                    intentR.putExtra("name" , response);
-                    setResult(RESULT_OK,intentR); //결과를 저장
-                    finish()
-                }
+                        }
+                        else if(response.equals("loginSuccess")){
+                            Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
+                            var str = response.split("닉네임")
+                            Log.d("닉네임",str[1])
+                            insertProfile(ProfileEntity(id, password, str[1])) // 내부 db 저장
+                            val intentR = intent
+                            setResult(RESULT_OK,intentR); //결과를 저장
+                            finish()
+                        }
+                        else{
+                            Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
+
+                            try {
+                                var str = response.split("닉네임")
+                                val jarray = JSONArray(str[0])
+                                Log.d("닉네임",str[1])
+                                insertProfile(ProfileEntity(id, password, str[1])) // 내부 db 저장
+                                val size = jarray.length()
+                                for (i in 0 until size) {
+                                    val jsonObject = jarray.getJSONObject(i)
+                                    val id = jsonObject.getString("friend_id");
+                                    val name = jsonObject.getString("friend_name");
+                                    insertFriend(FriendEntity(id,name))
+                                }
+                            } catch (e : JSONException) {
+                                e.printStackTrace()
+                            }
+                            val intentR = intent
+                            setResult(RESULT_OK,intentR); //결과를 저장
+                            finish()
+                        }
             },
             Response.ErrorListener { error ->
                 Log.d("통신 에러",error.toString())

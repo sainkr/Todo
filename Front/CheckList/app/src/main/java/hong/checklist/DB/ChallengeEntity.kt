@@ -14,8 +14,5 @@ data class ChallengeEntity (
     var name : String,
 
     @ColumnInfo(name = "add")
-    var add: Int,
-
-    @ColumnInfo(name = "contents")
-    var contents : List<ChallengeContents>?= null
+    var add: Int
 )

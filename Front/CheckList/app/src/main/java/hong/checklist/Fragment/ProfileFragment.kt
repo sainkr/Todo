@@ -104,7 +104,8 @@ class ProfileFragment : Fragment(){
                     login_success = true
                     tv_name.setText(profileList[0].name)
                     tv_name.setTextColor(Color.parseColor("#000000"))
-                    friendVolley(requireContext(),url_request, profileList[0].id )
+                    // friendVolley(requireContext(),url_request, profileList[0].id )
+                    getFriend()
                 }
             }
         }
@@ -200,8 +201,8 @@ class ProfileFragment : Fragment(){
         if(requestCode == REQUEST_CODE){
             if(resultCode != Activity.RESULT_OK)
                 return
-            tv_name.setText(data?.extras?.getString("name"))
-            tv_name.setTextColor(Color.parseColor("#000000"))
+
+            getProfile()
         }
     }
 

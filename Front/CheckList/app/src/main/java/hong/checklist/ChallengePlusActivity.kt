@@ -27,16 +27,20 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
     // 로그인 안했으면 로그인 페이지로
 
     lateinit var db : CheckListDatabase
-    var profileList = listOf<ProfileEntity>()
     var friendentityList = listOf<FriendEntity>()
     var friendList = ArrayList<ChallengeFriendContents>()
     var check_list = ArrayList<Int>()
 
     val url_challenge = "http://192.168.35.135:8080/CheckList/Challenge.jsp"
 
+    var host_id =""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_challengeplus)
+
+        var intent = intent
+        host_id = intent.getStringExtra("host_id")
 
         db = CheckListDatabase.getInstance(this)!!
 
@@ -56,15 +60,15 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
                 Toast.makeText(this, "모임명을 입력해주세요", Toast.LENGTH_LONG).show()
             }
             else{
-                var member : String = ""
+                var member : String = "$host_id"
                 for(i in 0 until check_list.size){
-                    member += friendList.get(check_list.get(i)).id+" "
+                    member += " $friendList.get(check_list.get(i)).id"
                 }
 
                 if(check_list.size == 0)
                     Toast.makeText(this, "모임원을 선택해주세요", Toast.LENGTH_LONG).show()
                 else {
-                    addVolley(this, url_challenge, name, member)
+                    addVolley(this, url_challenge, name,host_id, member)
                 }
             }
 
@@ -130,6 +134,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
         context: Context,
         url: String,
         name: String,
+        host_id: String,
         member: String
     ) {
 
@@ -145,7 +150,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
                 else{
                     var list = ArrayList<ChallengeContents>()
 
-                    addChallenge(ChallengeEntity(response.toInt(),name,1, list))
+                    addChallenge(ChallengeEntity(response.toInt(),name,1))
                 }
             },
             Response.ErrorListener { error ->
@@ -156,6 +161,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
                 val params: MutableMap<String, String> = HashMap()
                 params["type"] = "addChallenge"
                 params["name"] = name
+                params["host_id"] = host_id
                 params["member"] = member
 
                 return params

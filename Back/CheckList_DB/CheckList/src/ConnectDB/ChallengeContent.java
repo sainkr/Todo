@@ -34,7 +34,7 @@ public class ChallengeContent {
 			   
 				conn = cDB.getConn();
 				
-				sql = "insert into challenge"+ code +" values (?, ?)";
+				sql = "insert into challenge"+ code +"todo (content) todo values (?)";
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, num);
 				pstmt.setString(2, content);
@@ -82,7 +82,7 @@ public class ChallengeContent {
 		  try {
 			   System.out.println(code+" "+num +" " + content);
 			   
-				sql = "update challenge"+ code +" set content = ? where num = ?";
+				sql = "update challenge"+ code +"todo set content = ? where code = ?";
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, content);
 				pstmt.setInt(2, Integer.parseInt(num));
@@ -130,7 +130,7 @@ public class ChallengeContent {
 		  try {
 			   System.out.println(code+" "+num);
 			   
-				sql = "delete from challenge"+ code +"where num = ?";
+				sql = "delete from challenge"+ code +"todo where num = ?";
 				pstmt = conn.prepareStatement(sql);
 				pstmt.setInt(1, Integer.parseInt(num));
 				pstmt.executeUpdate();	//	db에 쿼리문 입력

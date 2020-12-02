@@ -40,11 +40,40 @@ public class Login {
 					pstmt.executeUpdate();	//	db에 쿼리문 입력
 					
 					returns = "joinSuccess";
+					
+					// id+todo 테이블 생성
+					sql = "create table "+id+"todo ("
+							+ "date varchar(10) not null,"
+							+ "todo varchar(1000) not null,"
+							+ "todo_check int not null )";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.executeUpdate();	
+					
+					// id+friend 테이블 생성
+					sql = "create table "+id+"friend ("
+							+ "friend_id varchar(30) not null)";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.executeUpdate();	
+					
+					// id+challenge 테이블 생성
+					sql = "create table "+id+"challenge ("
+							+ "challenge_code int not null)";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.executeUpdate();	
+					
+					// id+challengetodo 테이블 생성
+					sql = "create table "+id+"challengetodo ("
+							+ "code int not null,"
+							+ "num int not null,"
+							+ "todo varchar(1000) not null,"
+							+ "todo_check int not null)";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.executeUpdate();	
 				
 					
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
-					System.err.println("Login SQLException error");
+					System.err.println(e);
 					returns = "error";
 				} finally {
 					if (pstmt != null)
@@ -89,29 +118,33 @@ public class Login {
 			pstmt.setString(2, password);
 			rs = pstmt.executeQuery();		
 
+			String name = "";
 			if(rs.next()) {
-				JSONArray jary = new JSONArray();
-				String friend_id = rs.getString("friend_id");
-				String[] arr = friend_id.split(" ");
+				name = rs.getString("name");
 				
-				for(int i =0; i<arr.length; i++) {
+				sql = "select * from "+id+"friend";
+				pstmt = conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();	
+				
+				JSONArray jary = new JSONArray();
+				while(rs.next()) {
+					JSONObject jobj = new JSONObject();
 					
 					sql = "select * from profile where id = ?";
+					pstmt.setString(1, rs.getString("friend_id"));
 					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, arr[i]);
 					rs_sub = pstmt.executeQuery();	
 					
-					JSONObject jobj = new JSONObject();
-					jobj.put("name",rs.getString("name"));
-					jobj.put("id",arr[i]);
-					jobj.put("name",rs_sub.getString("name"));
+					jobj.put("friend_id",rs.getString("friend_id"));
+					jobj.put("friend_name",rs_sub.getString("name"));
 					jary.add(jobj);
 				}
 				
-				if(jary.size() == 0)
-					returns = rs.getString("name");
-				else
-					returns = jary.toJSONString();
+				if(jary.size() > 0)
+					returns = jary.toJSONString()+"닉네임"+name;
+				else {
+					returns = "loginSuccess "+name;
+				}
 	
 			}
 			else
@@ -120,7 +153,7 @@ public class Login {
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			System.err.println("Login SQLException error");
+			System.err.println(e);
 			returns = "error";
 		} finally {
 			if (pstmt != null)

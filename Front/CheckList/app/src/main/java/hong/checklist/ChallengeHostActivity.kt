@@ -20,12 +20,13 @@ import hong.checklist.DB.*
 import hong.checklist.Listener.MyButtonClickListener
 import hong.checklist.Listener.OnCheckListener
 import kotlinx.android.synthetic.main.activity_challengehost.*
+import org.json.JSONArray
+import org.json.JSONException
 
 @SuppressLint("StaticFieldLeak")
 class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
 
     lateinit var db : CheckListDatabase
-    var challengeentityList = listOf<ChallengeEntity>()
     var challengeList = ArrayList<ChallengeContents>()
 
     var update_check = false
@@ -33,8 +34,10 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
 
     var code: Int =0
     var name: String =""
+    var my_id: String =""
 
     val url_challenge = "http://192.168.35.135:8080/CheckList/ChallengeContent.jsp"
+    val url_challengetodo = "http://192.168.35.135:8080/CheckList/ChallengeTodo.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,7 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
         var intent = intent
         code = intent.extras?.getInt("code")!!
         name = intent.extras?.getString("name")!!
+        my_id = intent.extras?.getString("my_id")!!
 
         val manager = LinearLayoutManager(this)
         manager.reverseLayout = true
@@ -52,12 +56,9 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
         recyclerView_challengetodo.layoutManager = manager
         recyclerView_challengetodo.setHasFixedSize(true)
 
-
-        getChallenge(code)
-
+        getChallengeTodoVolley(this, url_challengetodo, my_id, code.toString())
 
         tv_challengename.setText(name)
-
 
         // 스와이프해서 수정, 삭제
         val swipe = object : MySwipeHelper(this, recyclerView_challengetodo, 200){
@@ -81,9 +82,6 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
                                 setRecyclerView(challengeList)
                                 et_challengtodo.setText("")
                                 update_check = false
-
-                                //DB 저장
-                                saveDB(code, name)
 
                             }
                         })
@@ -148,8 +146,6 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
                     et_challengtodo.setText("")
                     setRecyclerView(challengeList)
 
-                    //DB 저장
-                    saveDB(code, name)
                 }
 
                 // 키보드 내리기
@@ -170,48 +166,105 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
 
     override fun onCheckListener(position: Int, check: Int) {
         challengeList.set(position,ChallengeContents(challengeList.get(position).num,challengeList.get(position).content,check))
-        saveDB(code, name)
+        setCheckChallengeTodoVolley(this, url_challengetodo, my_id, code.toString(), challengeList.get(position).num.toString());
     }
 
-    fun setChallenge(challenge : ChallengeEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.challengeDAO().insert(challenge)
-            }
-        }
-        insertTask.execute()
-    }
 
-    fun getChallenge(num : Int){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                challengeentityList = db.challengeDAO().getChallenge(num)
-            }
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if(challengeentityList.size > 0){
-                    val list = challengeentityList.get(0).contents
+    private fun getChallengeTodoVolley(
+        context: Context,
+        url: String,
+        my_id : String,
+        code : String
+    ) {
 
-                    if(list!= null){
-                        for(i in list.indices) {
-                            challengeList.add(ChallengeContents(list[i].num, list[i].content , list[i].check))
-                        }
-                        setRecyclerView(challengeList)
-                    }
+        // 1. RequestQueue 생성 및 초기화
+        var requestQueue = Volley.newRequestQueue(this)
+
+        // 2. Request Obejct인 StringRequest 생성
+        val request: StringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener { response ->
+                if(response.equals("error")){
 
                 }
+                else if(response.equals("challengeNoting")){
+
+                }
+                else{
+                    try {
+                        val jarray = JSONArray(response)
+                        val size = jarray.length()
+                        for (i in 0 until size) {
+                            val jsonObject = jarray.getJSONObject(i)
+                            val num = jsonObject.getString("num");
+                            val content = jsonObject.getString("content");
+                            val check = jsonObject.getString("check");
+                            challengeList.add(ChallengeContents(num.toInt(),content, check.toInt()))
+                        }
+                    } catch (e : JSONException) {
+                        e.printStackTrace()
+                    }
+
+                    setRecyclerView(challengeList)
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.d("통신 실패",error.toString())
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["type"] = "getChallengetodo"
+                params["host_id"] = my_id
+                params["code"] = code
+                params["num"] = ""
+                params["check"] = ""
+
+                return params
             }
         }
-
-        insertTask.execute()
+        // 3) 생성한 StringRequest를 RequestQueue에 추가
+        requestQueue.add(request)
     }
 
-    fun saveDB(code : Int, name : String){
-        // DB 저장
-        val contentList : List<ChallengeContents> = challengeList
+    private fun setCheckChallengeTodoVolley(
+        context: Context,
+        url: String,
+        my_id : String,
+        code : String,
+        num: String
+    ) {
 
-        val challenge = ChallengeEntity(code,name,1,contentList)
-        setChallenge(challenge)
+        // 1. RequestQueue 생성 및 초기화
+        var requestQueue = Volley.newRequestQueue(this)
+
+        // 2. Request Obejct인 StringRequest 생성
+        val request: StringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener { response ->
+                if(response.equals("error")){
+
+                }
+                else if(response.equals("setCheckSuccess")){
+
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.d("통신 실패",error.toString())
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["type"] = "getChallengetodo"
+                params["host_id"] = my_id
+                params["code"] = code
+                params["num"] = num
+
+                return params
+            }
+        }
+        // 3) 생성한 StringRequest를 RequestQueue에 추가
+        requestQueue.add(request)
     }
 
     private fun setChallengeTodoVolley(
