@@ -2,36 +2,32 @@ package hong.checklist
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import hong.checklist.Adapter.ChallengeFriendAdapter
-import hong.checklist.Adapter.TodoAdapter
-import hong.checklist.DB.*
+import hong.checklist.Data.ChallengeFriendContents
+import hong.checklist.Data.FriendContents
 import hong.checklist.Listener.OnCheckListener
 import kotlinx.android.synthetic.main.activity_challengeplus.*
-import kotlinx.android.synthetic.main.fragment_profile.*
+import org.json.JSONArray
 
 @SuppressLint("StaticFieldLeak")
-class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
+class ChallengeAddActivity : AppCompatActivity(), OnCheckListener {
 
     // 인원제한 100명까지
     // 로그인 안했으면 로그인 페이지로
 
-    lateinit var db : CheckListDatabase
-    var friendentityList = listOf<FriendEntity>()
     var friendList = ArrayList<ChallengeFriendContents>()
     var check_list = ArrayList<Int>()
 
     val url_challenge = "http://192.168.35.76:8080/CheckList/ChallengeAdd.jsp"
+    val url_friend = "http://192.168.35.76:8080/CheckList/Friend.jsp"
 
     var host_id =""
 
@@ -42,13 +38,11 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
         var intent = intent
         host_id = intent.getStringExtra("host_id")
 
-        db = CheckListDatabase.getInstance(this)!!
-
         val manager = LinearLayoutManager(this)
         recyclerView_challengeplus.layoutManager = manager
         recyclerView_challengeplus.setHasFixedSize(true)
 
-        getFriend()
+        friendVolley(this, url_friend, host_id)
 
         tv_back.setOnClickListener {
            finish()
@@ -68,7 +62,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
                 if(check_list.size == 0)
                     Toast.makeText(this, "모임원을 선택해주세요", Toast.LENGTH_LONG).show()
                 else {
-                    addVolley(this, url_challenge, name,host_id, member)
+                    addVolley(this, url_challenge, name, host_id, member)
                 }
             }
 
@@ -92,36 +86,14 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
             }
         }
 
-        friendList.set(position,ChallengeFriendContents(friendList.get(position).name,check,friendList.get(position).id))
+        friendList.set(position,
+            ChallengeFriendContents(
+                friendList.get(position).name,
+                check,
+                friendList.get(position).id
+            )
+        )
         setRecyclerView(friendList)
-    }
-
-    fun getFriend(){
-        val getTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                friendentityList = db.friendDAO().getFriend()
-            }
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if(friendentityList.size > 0){
-                    for(i in 0 until friendentityList.size)
-                        friendList.add(ChallengeFriendContents(friendentityList.get(i).name, 0,friendentityList.get(i).code))
-                    setRecyclerView(friendList)
-                }
-            }
-        }
-
-        getTask.execute()
-    }
-
-    fun addChallenge(challenge : ChallengeEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.challengeDAO().insert(challenge)
-            }
-        }
-
-        insertTask.execute()
     }
 
     private fun addVolley(
@@ -142,8 +114,6 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
 
                 }
                 else{
-                    addChallenge(ChallengeEntity(response.toInt(),name,1))
-
                     val intentR = intent
                     setResult(RESULT_OK,intentR); //결과를 저장
                     finish()
@@ -158,7 +128,60 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
                 params["type"] = "addChallenge"
                 params["name"] = name
                 params["host_id"] = host_id
-                params["member"] = member
+                params["code"] = ""
+                params["add_member"] = member
+                params["delete_member"] = ""
+
+                return params
+            }
+        }
+        // 3) 생성한 StringRequest를 RequestQueue에 추가
+        requestQueue.add(request)
+    }
+
+    private fun friendVolley(
+        context: Context,
+        url: String,
+        id: String
+    ) {
+
+        // 1. RequestQueue 생성 및 초기화
+        var requestQueue = Volley.newRequestQueue(context)
+
+        // 2. Request Obejct인 StringRequest 생성
+        val request: StringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener { response ->
+                if(response.equals("requstNoting")){
+
+                }
+                else if(response.equals("error")){
+
+                }
+                else{
+                    val jarray = JSONArray(response)
+                    val size = jarray.length()
+
+                    for (i in 0 until size) {
+                        val jsonObject = jarray.getJSONObject(i)
+                        val id = jsonObject.getString("friend_id")
+                        val name = jsonObject.getString("name")
+
+                        friendList.add(ChallengeFriendContents(name, 0, id))
+                    }
+
+                    setRecyclerView(friendList)
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.d("통신 에러",error.toString())
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["type"] = "getFriend"
+                params["my_id"] = id
+                params["friend_id"] = ""
 
                 return params
             }

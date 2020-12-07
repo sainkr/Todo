@@ -25,6 +25,84 @@ public class ChallengeTodo {
 	private ResultSet rs_sub;	
 	private String returns;
 	
+	public String getChallenge(String my_id) {
+		try {
+			    System.out.println(my_id);
+				conn = cDB.getConn();
+				sql = "select * from "+my_id+"challenge";
+				pstmt = conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();	//	db에 쿼리문 입력
+				
+				JSONArray jary = new JSONArray();
+				
+				while(rs.next()) {
+					JSONObject jobj = new JSONObject();
+					
+					sql = "select * from challenge where code = ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setInt(1,rs.getInt("challenge_code"));
+					rs_sub = pstmt.executeQuery();	//	db에 쿼리문 입력
+					
+					if(rs_sub.next()) {
+						jobj.put("name",rs_sub.getString("challenge_name"));
+						jobj.put("code",rs_sub.getInt("code"));
+						
+						if(rs_sub.getString("host_id").equals(my_id)) 
+							jobj.put("host",1);
+						else
+							jobj.put("host",0);
+						
+						jary.add(jobj);
+					}
+					
+				}
+				
+				if(jary.size() == 0)
+					returns = "challengeNoting";
+				else
+					returns = jary.toJSONString();
+							
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				System.err.println(e);
+				returns = "error";
+			} finally {
+				if (pstmt != null)
+					try {
+						pstmt.close();
+					} catch (SQLException ex) {
+						System.err.println("Login SQLException error");
+						returns = "error";
+					}
+				if (conn != null)
+					try {
+						conn.close();
+					} catch (SQLException ex) {
+						System.err.println("Login SQLException error");
+						returns = "error";
+					}
+				if (rs != null)
+					try {
+						rs.close();
+					} catch (SQLException ex) {
+						System.err.println("Login SQLException error");
+						returns = "error";
+					}
+				
+				if(rs_sub != null)
+					try {
+						rs_sub.close();
+					} catch (SQLException ex) {
+						System.err.println("Login SQLException error");
+						returns = "error";
+					}
+			}
+			
+			System.out.println(returns);
+		  
+		
+			return returns;
+	}
 	
 	public String getMember(String code) {
 		try {

@@ -15,18 +15,18 @@ public class FriendCnt {
 		this.target_id = target_id;
 		
 		if(type.equals("addFriend"))
-			addRequest(request_id, target_id);
+			addFriend(request_id, target_id);
 		else
-			getRequest(request_id);
+			getFriend(request_id);
 	
 	}
 	
-	public void addRequest(String request_id, String target_id) {
-		result = requestjsp.addRequest(request_id, target_id);
+	public void addFriend(String request_id, String target_id) {
+		result = requestjsp.addFriend(request_id, target_id);
 	}
 	
-	public void getRequest(String request_id) {
-		result = requestjsp.getRequest(request_id);
+	public void getFriend(String request_id) {
+		result = requestjsp.getFriend(request_id);
 	}
 	
 	public String getResult() {

@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import hong.checklist.Data.ChallengeContents
 import hong.checklist.Listener.OnChallengeTouchListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.item_friend.view.*
 
-class ChallengenameAdapter(val context : Context?, var list : List<String> ,var onTouchListener : OnChallengeTouchListener) : RecyclerView.Adapter<ChallengenameAdapter.MyViewHolder>(){
+class ChallengenameAdapter(val context : Context?, var list : List<ChallengeContents>, var onTouchListener : OnChallengeTouchListener) : RecyclerView.Adapter<ChallengenameAdapter.MyViewHolder>(){
 
     // 정의 해주는
     inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -28,7 +29,7 @@ class ChallengenameAdapter(val context : Context?, var list : List<String> ,var 
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val name = list[position]
+        val name = list[position].name
 
         holder.name.text = name
 

@@ -2,6 +2,7 @@ package hong.checklist.Fragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
@@ -14,18 +15,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import hong.checklist.Adapter.ChallengenameAdapter
-import hong.checklist.Adapter.FriendAdapter
 import hong.checklist.ChallengeHostActivity
 import hong.checklist.ChallengeMemberActivity
-import hong.checklist.ChallengePlusActivity
-import hong.checklist.DB.ChallengeEntity
+import hong.checklist.ChallengeAddActivity
 import hong.checklist.DB.CheckListDatabase
-import hong.checklist.DB.FriendEntity
 import hong.checklist.DB.ProfileEntity
+import hong.checklist.Data.ChallengeContents
 import hong.checklist.Listener.OnChallengeTouchListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.fragment_challenge.*
+import org.json.JSONArray
 
 @SuppressLint("StaticFieldLeak")
 class ChallengeFragment : Fragment(), OnChallengeTouchListener {
@@ -33,11 +36,12 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
     var REQUEST_CODE = 10
 
     lateinit var db : CheckListDatabase
-    var challengeentityList = listOf<ChallengeEntity>()
     var profileList = listOf<ProfileEntity>()
 
     var my_id:String =""
-    var challengeList = ArrayList<String>()
+    var challengeList = ArrayList<ChallengeContents>()
+
+    val url_challengetodo = "http://192.168.35.76:8080/CheckList/ChallengeTodo.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +59,6 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
         db = CheckListDatabase.getInstance(requireContext())!!
 
         getProfile()
-        getChallenge()
 
         val manager = LinearLayoutManager(context)
         recyclerView_challengename.layoutManager = manager
@@ -66,7 +69,7 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
                 Toast.makeText(requireContext(), "로그인이 필요한 서비스입니다.", Toast.LENGTH_LONG).show()
             }
             else{
-                val intent = Intent(requireContext(), ChallengePlusActivity::class.java)
+                val intent = Intent(requireContext(), ChallengeAddActivity::class.java)
                 intent.putExtra("host_id",my_id)
                 startActivityForResult(intent,REQUEST_CODE)
             }
@@ -74,26 +77,25 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
         return view
     }
 
-    fun setRecyclerView(list : List<String>){
+    fun setRecyclerView(list : List<ChallengeContents>){
         recyclerView_challengename.adapter = ChallengenameAdapter(context, list,this)
     }
 
     override fun onChallengeTouchListener(position: Int) {
-        if(challengeentityList.get(position).add == 1) // 방장이면
+        if(challengeList.get(position).host == 1) // 방장이면
         {
             val intent = Intent(requireContext(), ChallengeHostActivity::class.java)
-            intent.putExtra("code",challengeentityList.get(position).code)
-            intent.putExtra("name",challengeentityList.get(position).name)
+            intent.putExtra("code",challengeList.get(position).code)
+            intent.putExtra("name",challengeList.get(position).name)
             intent.putExtra("my_id",my_id)
-            // intent.putParcelableArrayListExtra("challengeeentityList",challengeentityList )
-            startActivity(intent)
+            startActivityForResult(intent,REQUEST_CODE)
         }
         else{
             val intent = Intent(requireContext(), ChallengeMemberActivity::class.java)
-            intent.putExtra("code",challengeentityList.get(position).code)
-            intent.putExtra("name",challengeentityList.get(position).name)
+            intent.putExtra("code",challengeList.get(position).code)
+            intent.putExtra("name",challengeList.get(position).name)
             intent.putExtra("my_id",my_id)
-            startActivity(intent)
+            startActivityForResult(intent,REQUEST_CODE)
         }
     }
 
@@ -107,32 +109,67 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
                 super.onPostExecute(result)
                 if (profileList.size > 0) {
                     my_id = profileList.get(0).id
+                    getChallengeVolley(requireContext(), url_challengetodo, my_id)
                 }
             }
         }
         getTask.execute()
     }
 
+    private fun getChallengeVolley(
+        context: Context,
+        url: String,
+        my_id : String
+    ) {
 
-    fun getChallenge(){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                challengeentityList = db.challengeDAO().getChallenge()
+        // 1. RequestQueue 생성 및 초기화
+        var requestQueue = Volley.newRequestQueue(context)
+
+        // 2. Request Obejct인 StringRequest 생성
+        val request: StringRequest = object : StringRequest(
+            Method.POST, url,
+            Response.Listener { response ->
+                if(response.equals("error")){
+
+
+                }
+                else if(response.equals("challengeNoting")){
+
+                }
+                else{
+                    val jarray = JSONArray(response)
+                    val size = jarray.length()
+
+                    for (i in 0 until size) {
+                        val jsonObject = jarray.getJSONObject(i)
+
+                        val name = jsonObject.getString("name")
+                        val code = jsonObject.getInt("code")
+                        val host = jsonObject.getInt("host")
+
+                        challengeList.add(ChallengeContents(name, code, host))
+                    }
+
+                    setRecyclerView(challengeList)
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.d("통신 실패",error.toString())
             }
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-               if(challengeentityList.size > 0){
-                   for(i in 0 until challengeentityList.size ){
-                       challengeList.add(challengeentityList.get(i).name)
-                   }
-                   setRecyclerView(challengeList)
-               }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["type"] = "getChallenge"
+                params["my_id"] = my_id
+                params["code"] = ""
+                params["num"] = ""
+
+                return params
             }
         }
-
-        insertTask.execute()
+        // 3) 생성한 StringRequest를 RequestQueue에 추가
+        requestQueue.add(request)
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -140,7 +177,9 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
         if(requestCode == REQUEST_CODE){
             if(resultCode != Activity.RESULT_OK)
                 return
-            getChallenge()
+
+            challengeList.clear()
+            getChallengeVolley(requireContext(), url_challengetodo, my_id)
         }
     }
 

@@ -118,15 +118,18 @@ public class Login {
 			pstmt.setString(2, password);
 			rs = pstmt.executeQuery();		
 
-			String name = "";
+			
 			if(rs.next()) {
-				name = rs.getString("name");
+				String name = rs.getString("name");
 				
 				sql = "select * from "+id+"friend";
 				pstmt = conn.prepareStatement(sql);
 				rs = pstmt.executeQuery();	
 				
-				JSONArray jary = new JSONArray();
+				returns = name;
+				
+				/*
+				 * JSONArray jary = new JSONArray();
 				while(rs.next()) {
 					JSONObject jobj = new JSONObject();
 					
@@ -147,7 +150,7 @@ public class Login {
 					returns = jary.toJSONString()+"닉네임"+name;
 				else {
 					returns = "loginSuccess "+name;
-				}
+				}*/
 	
 			}
 			else

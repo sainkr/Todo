@@ -9,7 +9,7 @@ import hong.checklist.Data.FriendContents
 import hong.checklist.R
 import kotlinx.android.synthetic.main.item_friend.view.*
 
-class FriendAdapter(val context : Context?, var list : List<FriendContents>) : RecyclerView.Adapter<FriendAdapter.MyViewHolder>(){
+class MemberAdapter(val context : Context?, var list : List<String>) : RecyclerView.Adapter<MemberAdapter.MyViewHolder>(){
 
     // 정의 해주는
     inner class MyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -28,7 +28,7 @@ class FriendAdapter(val context : Context?, var list : List<FriendContents>) : R
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val name = list[position].name
+        val name = list[position]
 
         holder.name.text = name
     }

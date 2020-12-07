@@ -27,8 +27,6 @@ class LoginActivity : AppCompatActivity() {
     val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
     lateinit var db : CheckListDatabase
 
-    var friendentityList = listOf<FriendEntity>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -70,16 +68,6 @@ class LoginActivity : AppCompatActivity() {
         insertTask.execute()
     }
 
-    fun insertFriend(friend : FriendEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.friendDAO().insert(friend)
-            }
-        }
-
-        insertTask.execute()
-    }
-
     private fun loginVolley(
         context: Context,
                 url: String,
@@ -100,30 +88,13 @@ class LoginActivity : AppCompatActivity() {
                         else if(response.equals("error")){
 
                         }
-                        else if(response.equals("loginSuccess")){
-                            Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
-                            var str = response.split("닉네임")
-                            Log.d("닉네임",str[1])
-                            insertProfile(ProfileEntity(id, password, str[1])) // 내부 db 저장
-                            val intentR = intent
-                            setResult(RESULT_OK,intentR); //결과를 저장
-                            finish()
-                        }
                         else{
                             Toast.makeText(this,"로그인 성공",Toast.LENGTH_LONG).show()
 
                             try {
-                                var str = response.split("닉네임")
-                                val jarray = JSONArray(str[0])
-                                Log.d("닉네임",str[1])
-                                insertProfile(ProfileEntity(id, password, str[1])) // 내부 db 저장
-                                val size = jarray.length()
-                                for (i in 0 until size) {
-                                    val jsonObject = jarray.getJSONObject(i)
-                                    val id = jsonObject.getString("friend_id");
-                                    val name = jsonObject.getString("friend_name");
-                                    insertFriend(FriendEntity(id,name))
-                                }
+                                Log.d("닉네임",response)
+                                insertProfile(ProfileEntity(id, password, response)) // 내부 db 저장
+
                             } catch (e : JSONException) {
                                 e.printStackTrace()
                             }

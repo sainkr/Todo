@@ -5,8 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import hong.checklist.DB.ChallengeFriendContents
-import hong.checklist.DB.TodoContents
+import hong.checklist.Data.ChallengeFriendContents
 import hong.checklist.Listener.OnCheckListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.item_checklist.view.*

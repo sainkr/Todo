@@ -1,9 +1,10 @@
 package hong.checklist
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
@@ -16,12 +17,11 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import hong.checklist.Adapter.ChallengeTodoAdapter
-import hong.checklist.Adapter.FriendAdapter
+import hong.checklist.Adapter.MemberAdapter
 import hong.checklist.DB.*
 import hong.checklist.Listener.MyButtonClickListener
 import hong.checklist.Listener.OnCheckListener
 import kotlinx.android.synthetic.main.activity_challengehost.*
-import kotlinx.android.synthetic.main.fragment_challenge.*
 import org.json.JSONArray
 import org.json.JSONException
 
@@ -32,6 +32,9 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
     var challengeList = ArrayList<ChallengeContents>()
     var successList = ArrayList<String>()
     var failList = ArrayList<String>()
+    var memberList = ArrayList<String>()
+
+    var REQUEST_CODE = 10
 
     var update_check = false
     var update_position = 0
@@ -169,6 +172,15 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
         }
 
 
+        iv_challengoption.setOnClickListener{
+            val intent = Intent(this, ChallengeEditActivity::class.java)
+            intent.putExtra("code",code)
+            intent.putExtra("name",name)
+            intent.putExtra("id",my_id)
+            intent.putStringArrayListExtra("list", memberList)
+            startActivityForResult(intent,REQUEST_CODE)
+        }
+
     }
 
     fun setRecyclerView(list : List<ChallengeContents>){
@@ -176,7 +188,7 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
     }
 
     fun setRecyclerView(recylclerview : RecyclerView, list : List<String>){
-        recylclerview.adapter = FriendAdapter(this, list)
+        recylclerview.adapter = MemberAdapter(this, list)
     }
 
     override fun onCheckListener(position: Int, check: Int) {
@@ -270,8 +282,6 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
                             val name = jsonObject.getString("name");
                             val success = jsonObject.getInt("success");
 
-
-
                             if(success == 1){
                                 successList.add(name)
                             }
@@ -279,6 +289,9 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
                                 Log.d("이름",name)
                                 failList.add(name)
                             }
+
+                            Log.d("멤버",member_id)
+                            memberList.add(member_id)
 
                         }
                     } catch (e : JSONException) {
@@ -387,5 +400,29 @@ class ChallengeHostActivity: AppCompatActivity(), OnCheckListener {
         }
         // 3) 생성한 StringRequest를 RequestQueue에 추가
         requestQueue.add(request)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == REQUEST_CODE){
+            if(resultCode != Activity.RESULT_OK)
+                return
+
+            val intentR = intent
+            setResult(RESULT_OK,intentR); //결과를 저장
+
+            if(data?.getStringExtra("name").toString().equals("drop")){
+                finish()
+            }
+            else{
+                name = data?.getStringExtra("name").toString()
+                Log.d("이름",name)
+                tv_challengename.setText(name)
+                successList.clear()
+                failList.clear()
+                getChallengeMember(this, url_challengetodo, my_id, code.toString())
+            }
+        }
     }
 }

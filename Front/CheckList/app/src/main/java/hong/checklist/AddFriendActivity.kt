@@ -25,37 +25,23 @@ class AddFriendActivity : AppCompatActivity() {
 
     val url_request = "http://192.168.35.76:8080/CheckList/Friend.jsp"
 
-    lateinit var db : CheckListDatabase
-
     override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_addfrined)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_addfrined)
 
-        db = CheckListDatabase.getInstance(this)!!
+        val intent = intent
+        val my_id = intent.getStringExtra("my_id")
 
-    val intent = intent
-    val my_id = intent.getStringExtra("my_id")
-
-    btn_friendadd.setOnClickListener {
-        if(et_frined_id.text.toString().equals(""))
-            Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_LONG).show()
-        else{
-            Log.d("진입","!")
-            requestfrinedVolley(this,url_request,my_id,et_frined_id.text.toString())
-        }
-    }
-}
-
-    fun insertFriend(friend : FriendEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.friendDAO().insert(friend)
+        btn_friendadd.setOnClickListener {
+            if (et_frined_id.text.toString().equals(""))
+                Toast.makeText(this, "다시 입력해주세요", Toast.LENGTH_LONG).show()
+            else {
+                Log.d("진입", "!")
+                requestfrinedVolley(this, url_request, my_id, et_frined_id.text.toString())
             }
         }
 
-        insertTask.execute()
     }
-
 
     private fun requestfrinedVolley(
         context: Context,
@@ -78,8 +64,6 @@ class AddFriendActivity : AppCompatActivity() {
 
                 }
                 else{
-                    insertFriend(FriendEntity(friend_id,response))
-
                     val intentR = intent
                     setResult(RESULT_OK,intentR); //결과를 저장
                     finish()

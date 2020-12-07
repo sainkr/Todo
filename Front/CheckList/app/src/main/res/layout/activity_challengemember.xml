@@ -20,17 +20,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <ImageView
-        android:id="@+id/iv_challengmemberoption"
-        android:src="@drawable/ic_baseline_more_vert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_challengetodo"
         android:layout_width="match_parent"
@@ -41,7 +30,7 @@
         android:layout_marginTop="15dp"
         android:scrollbarSize="2dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/iv_challengmemberoption"
+        app:layout_constraintTop_toBottomOf="@+id/tv_challengename"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -61,7 +50,7 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_challengesuccessmember"
+        android:id="@+id/recyclerView_successmember"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="20dp"
@@ -86,11 +75,11 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recyclerView_challengesuccessmember"
+        app:layout_constraintTop_toBottomOf="@id/recyclerView_successmember"
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_challengefailmember"
+        android:id="@+id/recyclerView_failmember"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="20dp"

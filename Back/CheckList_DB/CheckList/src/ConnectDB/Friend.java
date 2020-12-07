@@ -26,7 +26,7 @@ public class Friend {
 	private String returns;
 	
 	
-	public String addRequest(String request_id, String target_id) {
+	public String addFriend(String request_id, String target_id) {
 		
 		  if(getProfile(target_id).equals("loginSuccess")) {
 			  try {
@@ -86,35 +86,29 @@ public class Friend {
 		return returns;
 	}
 	
-	public String getRequest(String request_id) {
+	public String getFriend(String request_id) {
 		System.out.println("내 아이디"+ request_id);
 		
 	  try {
 			conn = cDB.getConn();
 			
-			sql = "select * from request_friend where target_id = ?";
+			sql = "select * from "+request_id+"friend";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, request_id);
 			rs = pstmt.executeQuery();			
 			
 			JSONArray jary = new JSONArray();
 			while(rs.next()) {
 				sql = "select * from profile where id = ?";
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, rs.getString("request_id"));
+				pstmt.setString(1, rs.getString("friend_id"));
 				rs_sub = pstmt.executeQuery();	
 			
 				while(rs_sub.next()) {
 					JSONObject jobj = new JSONObject();
-					jobj.put("id",rs.getString("request_id"));
+					jobj.put("id",rs.getString("friend_id"));
 					jobj.put("name",rs_sub.getString("name"));
 					jary.add(jobj);
 				}
-				
-				sql = "delete from request_friend where num = ?";
-				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, rs.getString("num"));
-				pstmt.executeUpdate();
 			}
 			
 			if(jary.size() == 0)
@@ -161,7 +155,7 @@ public class Friend {
 	
 		return returns;
 	}
-	
+		
 	public String getProfile(String id) {	
 		try {
 

@@ -11,6 +11,7 @@ import hong.checklist.R
 import java.util.*
 import kotlin.collections.ArrayList
 import android.content.Context
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class CalenderFragment(context: Context) : Fragment() {
@@ -26,10 +27,14 @@ class CalenderFragment(context: Context) : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_calender, container, false)
         val recyclerView_calendar: RecyclerView = view.findViewById(R.id.recyclerView_calendar)
+        val tv_calendar: TextView = view.findViewById(R.id.tv_calendar)
+
         val calendar = Calendar.getInstance() // 오늘 날짜
         var calendarList = ArrayList<String>();
 
         calendar.set(calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),1) // 1일로 날짜 설정
+
+        tv_calendar.setText(" ${calendar.get(Calendar.YEAR)}년 ${calendar.get(Calendar.MONTH)}월")
 
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) -1  //해당 월에 시작하는 요일 -1 을 하면 빈칸을 구할 수 있겠죠 ?
         val max = calendar.getActualMaximum(Calendar.DAY_OF_MONTH) // 해당 월에 마지막 요일

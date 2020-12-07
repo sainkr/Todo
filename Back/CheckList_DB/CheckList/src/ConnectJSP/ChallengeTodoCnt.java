@@ -15,13 +15,19 @@ public class ChallengeTodoCnt {
 		this.host_id = host_id;
 		this.num = num;
 		
-		if(type.equals("getChallengetodo"))
+		if(type.equals("getChallenge"))
+			getChallenge(host_id);
+		else if(type.equals("getChallengetodo"))
 			getChallengetodo(host_id, code);
 		else if(type.equals("setChallengetodo"))
 			setChallengetodo(host_id, code, num);
 		else if(type.equals("getMember")) {
 			getMember(code);
 		}
+	}
+	
+	public void getChallenge(String host_id) {
+		result = challengejsp.getChallenge(host_id);
 	}
 	
 	public void getChallengetodo(String host_id, String code) {
