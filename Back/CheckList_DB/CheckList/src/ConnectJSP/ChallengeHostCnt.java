@@ -1,16 +1,16 @@
 package ConnectJSP;
 
-import ConnectDB.ChallengeContent;
+import ConnectDB.ChallengeHost;
 
-public class ChallengeContentCnt {
+public class ChallengeHostCnt {
 	
-	private ChallengeContent challengejsp = ChallengeContent.getInstance();
+	private ChallengeHost challengejsp = ChallengeHost.getInstance();
 
 	private String num;
 	private String content;
 	private String result;
 
-	public ChallengeContentCnt(String type, String code, String num, String content) {
+	public ChallengeHostCnt(String type, String code, String num, String content) {
 		this.num = num;
 		this.content = content;
 		

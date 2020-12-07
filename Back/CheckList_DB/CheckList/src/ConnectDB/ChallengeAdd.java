@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class Challenge {
+public class ChallengeAdd {
 	
-	private static Challenge instance = new Challenge();
+	private static ChallengeAdd instance = new ChallengeAdd();
 
-	public static Challenge getInstance() {
+	public static ChallengeAdd getInstance() {
 		return instance;
 	}
 	
@@ -30,6 +30,7 @@ public class Challenge {
 		
 	  try {
 		  System.out.println(name +" "+ host_id+ " "+ member);
+		 
 			conn = cDB.getConn();
 			sql = "insert into challenge(host_id, challenge_name) values (?, ?)";
 			pstmt = conn.prepareStatement(sql);
@@ -38,7 +39,7 @@ public class Challenge {
 			pstmt.executeUpdate();	//	db에 쿼리문 입력
 			
 			// 고유 번호 불러오기
-			sql = "select * from challenge where host_id = ? and name = ?";
+			sql = "select * from challenge where host_id = ? and challenge_name = ? ";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, host_id);
 			pstmt.setString(2, name);
@@ -77,7 +78,10 @@ public class Challenge {
 					pstmt.setInt(1, code);
 					pstmt.executeUpdate();
 				}	
+				
+				 returns = String.valueOf(code);
 			}
+
 						
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

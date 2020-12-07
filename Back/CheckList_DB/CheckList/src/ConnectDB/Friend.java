@@ -42,7 +42,14 @@ public class Friend {
 					pstmt.setString(1, request_id);
 					pstmt.executeUpdate();	//	db에 쿼리문 입력
 					
-					returns = "requestSuccess";
+					sql = "select * from profile where id = ?";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, rs.getString("request_id"));
+					rs = pstmt.executeQuery();	
+				
+					if (rs.next()) 
+						returns = rs.getString("name");
+				
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					System.err.println("Login SQLException error");

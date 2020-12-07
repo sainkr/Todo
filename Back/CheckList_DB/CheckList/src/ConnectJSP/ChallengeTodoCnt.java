@@ -19,6 +19,9 @@ public class ChallengeTodoCnt {
 			getChallengetodo(host_id, code);
 		else if(type.equals("setChallengetodo"))
 			setChallengetodo(host_id, code, num);
+		else if(type.equals("getMember")) {
+			getMember(code);
+		}
 	}
 	
 	public void getChallengetodo(String host_id, String code) {
@@ -29,6 +32,9 @@ public class ChallengeTodoCnt {
 		result = challengejsp.setChallengetodo(host_id, code, num);
 	}
 	
+	public void getMember(String code) {
+		result = challengejsp.getMember(code);
+	}
 	
 	public String getResult() {
 		return result;

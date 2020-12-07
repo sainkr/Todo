@@ -24,7 +24,7 @@ import org.json.JSONException
 @SuppressLint("StaticFieldLeak")
 class LoginActivity : AppCompatActivity() {
 
-    val url_login = "http://192.168.35.135:8080/CheckList/Login.jsp"
+    val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
     lateinit var db : CheckListDatabase
 
     var friendentityList = listOf<FriendEntity>()

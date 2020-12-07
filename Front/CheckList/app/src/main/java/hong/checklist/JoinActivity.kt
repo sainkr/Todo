@@ -18,7 +18,7 @@ import org.json.JSONObject
 
 class JoinActivity : AppCompatActivity(){
 
-    val url_login = "http://192.168.35.135:8080/CheckList/Login.jsp"
+    val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

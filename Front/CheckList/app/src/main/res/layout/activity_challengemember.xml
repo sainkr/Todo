@@ -45,8 +45,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:id="@+id/tv_finishmem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:layout_marginTop="10dp"
+        android:text="다 한 사람"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerView_challengetodo"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_challengemember"
+        android:id="@+id/recyclerView_challengesuccessmember"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="20dp"
@@ -55,7 +70,36 @@
         android:layout_marginTop="15dp"
         android:scrollbarSize="2dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView_challengetodo"
+        app:layout_constraintTop_toBottomOf="@+id/tv_finishmem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_notfinishmem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:layout_marginTop="10dp"
+        android:text="못 한 사람"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerView_challengesuccessmember"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_challengefailmember"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:scrollbarSize="2dp"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/tv_notfinishmem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

@@ -1,10 +1,10 @@
 package ConnectJSP;
 
-import ConnectDB.Challenge;
+import ConnectDB.ChallengeAdd;
 
-public class ChallengeCnt {
+public class ChallengeAddCnt {
 	
-	private Challenge challengejsp = Challenge.getInstance();
+	private ChallengeAdd challengejsp = ChallengeAdd.getInstance();
 
 	private String name;
 	private String host_id;
@@ -12,7 +12,7 @@ public class ChallengeCnt {
 	private String result;
 
 
-	public ChallengeCnt(String type, String name, String host_id, String member) {
+	public ChallengeAddCnt(String type, String name, String host_id, String member) {
 		this.name = name;
 		this.host_id = host_id;
 		this.member = member;

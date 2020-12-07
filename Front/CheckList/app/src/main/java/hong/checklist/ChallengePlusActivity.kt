@@ -31,7 +31,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
     var friendList = ArrayList<ChallengeFriendContents>()
     var check_list = ArrayList<Int>()
 
-    val url_challenge = "http://192.168.35.135:8080/CheckList/Challenge.jsp"
+    val url_challenge = "http://192.168.35.76:8080/CheckList/ChallengeAdd.jsp"
 
     var host_id =""
 
@@ -62,7 +62,7 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
             else{
                 var member : String = "$host_id"
                 for(i in 0 until check_list.size){
-                    member += " $friendList.get(check_list.get(i)).id"
+                    member += " ${friendList.get(check_list.get(i)).id}"
                 }
 
                 if(check_list.size == 0)
@@ -119,12 +119,6 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
             override fun doInBackground(vararg p0: Unit?) {
                 db.challengeDAO().insert(challenge)
             }
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                val intentR = intent
-                setResult(RESULT_OK,intentR); //결과를 저장
-                finish()
-            }
         }
 
         insertTask.execute()
@@ -148,9 +142,11 @@ class ChallengePlusActivity : AppCompatActivity(), OnCheckListener {
 
                 }
                 else{
-                    var list = ArrayList<ChallengeContents>()
-
                     addChallenge(ChallengeEntity(response.toInt(),name,1))
+
+                    val intentR = intent
+                    setResult(RESULT_OK,intentR); //결과를 저장
+                    finish()
                 }
             },
             Response.ErrorListener { error ->

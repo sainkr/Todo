@@ -112,7 +112,7 @@ public class Login {
 		try {
 			System.out.println("id : " + id + " password : " + password);
 			conn = cDB.getConn();
-			sql = "select * from profile where id =? and password = ?";
+			sql = "select * from profile where id =? and password = ? ";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, id);
 			pstmt.setString(2, password);
@@ -130,14 +130,17 @@ public class Login {
 				while(rs.next()) {
 					JSONObject jobj = new JSONObject();
 					
-					sql = "select * from profile where id = ?";
-					pstmt.setString(1, rs.getString("friend_id"));
+					sql = "select * from profile where id = ? ";
 					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, rs.getString("friend_id"));
 					rs_sub = pstmt.executeQuery();	
 					
-					jobj.put("friend_id",rs.getString("friend_id"));
-					jobj.put("friend_name",rs_sub.getString("name"));
-					jary.add(jobj);
+					if(rs_sub.next()) {
+						jobj.put("friend_id",rs.getString("friend_id"));
+						jobj.put("friend_name",rs_sub.getString("name"));
+						jary.add(jobj);
+					}
+					
 				}
 				
 				if(jary.size() > 0)

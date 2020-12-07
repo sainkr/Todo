@@ -7,10 +7,11 @@
 <%
 	request.setCharacterEncoding("UTF-8");
 	String type = request.getParameter("type");
-	String code = request.getParameter("code");
-	String num = request.getParameter("num");
-	String content = request.getParameter("content");
-	ChallengeContentCnt challengecnt = new ChallengeContentCnt(type, code, num, content);
+	String name = request.getParameter("name");
+	String host_id = request.getParameter("host_id");
+	String member = request.getParameter("member");
+
+	ChallengeAddCnt challengecnt = new ChallengeAddCnt(type, name, host_id, member);
 	
 	String returns = challengecnt.getResult();
 	

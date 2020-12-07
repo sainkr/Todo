@@ -1,7 +1,9 @@
 package hong.checklist
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,16 +12,26 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import hong.checklist.DB.CheckListDatabase
+import hong.checklist.DB.FriendEntity
+import hong.checklist.DB.ProfileEntity
 import kotlinx.android.synthetic.main.activity_addfrined.*
 import kotlinx.android.synthetic.main.activity_login.*
+import org.json.JSONArray
+import org.json.JSONException
 
+@SuppressLint("StaticFieldLeak")
 class AddFriendActivity : AppCompatActivity() {
 
-    val url_request = "http://192.168.35.135:8080/CheckList/Friend.jsp"
+    val url_request = "http://192.168.35.76:8080/CheckList/Friend.jsp"
+
+    lateinit var db : CheckListDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_addfrined)
+
+        db = CheckListDatabase.getInstance(this)!!
 
     val intent = intent
     val my_id = intent.getStringExtra("my_id")
@@ -33,6 +45,17 @@ class AddFriendActivity : AppCompatActivity() {
         }
     }
 }
+
+    fun insertFriend(friend : FriendEntity){
+        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+            override fun doInBackground(vararg p0: Unit?) {
+                db.friendDAO().insert(friend)
+            }
+        }
+
+        insertTask.execute()
+    }
+
 
     private fun requestfrinedVolley(
         context: Context,
@@ -48,13 +71,20 @@ class AddFriendActivity : AppCompatActivity() {
         val request: StringRequest = object : StringRequest(
             Method.POST, url,
             Response.Listener { response ->
-                when(response){
-                    "requestFail" -> {Toast.makeText(context, "존재하지 않는 ID 입니다.", Toast.LENGTH_LONG).show()}
-                    "requestSuccess" -> { Toast.makeText(this,"친구신청 성공",Toast.LENGTH_LONG).show()
-                        finish()}
+                if(response.equals("requestFail")){
+                    Toast.makeText(context, "존재하지 않는 ID 입니다.", Toast.LENGTH_LONG).show()
                 }
-            },
-            Response.ErrorListener { error ->
+                else if(response.equals("error")){
+
+                }
+                else{
+                    insertFriend(FriendEntity(friend_id,response))
+
+                    val intentR = intent
+                    setResult(RESULT_OK,intentR); //결과를 저장
+                    finish()
+                }
+            }, Response.ErrorListener { error ->
                 Log.d("통신 에러",error.toString())
             }
         ) {
