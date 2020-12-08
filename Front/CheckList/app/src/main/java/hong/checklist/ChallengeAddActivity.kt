@@ -164,7 +164,7 @@ class ChallengeAddActivity : AppCompatActivity(), OnCheckListener {
 
                     for (i in 0 until size) {
                         val jsonObject = jarray.getJSONObject(i)
-                        val id = jsonObject.getString("friend_id")
+                        val id = jsonObject.getString("id")
                         val name = jsonObject.getString("name")
 
                         friendList.add(ChallengeFriendContents(name, 0, id))

@@ -1,18 +1,20 @@
 package hong.checklist.Adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import hong.checklist.DB.CheckListDatabase
+import hong.checklist.Listener.OnDateClickListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.item_day.view.*
 
-class CalendarAdapter(val context: Context, val list : ArrayList<String>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CalendarAdapter(val context: Context, val list : ArrayList<String>, var onDateClickListener: OnDateClickListener): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val EMPTY_TYPE = 0
     val DAY_TYPE = 1
-
 
     // 정의 해주는
     inner class EmptyViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -22,7 +24,7 @@ class CalendarAdapter(val context: Context, val list : ArrayList<String>): Recyc
     // 정의 해주는
     inner class DayViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val tv_day = itemView.tv_day
-        // val tv_goalcheck = itemView.tv_goalcheck
+        val root = itemView.item_day_root
 
     }
 
@@ -59,6 +61,12 @@ class CalendarAdapter(val context: Context, val list : ArrayList<String>): Recyc
             DAY_TYPE -> {
                 val day = list[position]
                 (holder as DayViewHolder).tv_day.text = day
+
+                holder.root.setOnClickListener(object : View.OnClickListener{
+                    override fun onClick(p0: View?) {
+                        onDateClickListener.OnDateClickListener(day)
+                    }
+                })
             }
         }
     }

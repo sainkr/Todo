@@ -4,7 +4,8 @@
     android:layout_width="60dp"
     android:layout_height="80dp"
     android:background="@drawable/item_day_background"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_day_root">
 
     <TextView
         android:id="@+id/tv_day"
@@ -16,23 +17,8 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_goalcheck"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/tv_goalcheck"
-        android:layout_width="37dp"
-        android:layout_height="51dp"
-        android:layout_marginBottom="12dp"
-        android:fontFamily="@font/uhbeeseulvely"
-        android:text="O"
-        android:textColor="@color/red"
-        android:textSize="50sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.521"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

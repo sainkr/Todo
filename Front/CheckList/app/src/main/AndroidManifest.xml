@@ -43,6 +43,9 @@
         <activity android:name=".AddFriendActivity">
         </activity>
 
+        <activity android:name=".DateActivity">
+        </activity>
+
     </application>
 
 </manifest>
