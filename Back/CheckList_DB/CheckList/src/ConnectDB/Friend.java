@@ -155,6 +155,64 @@ public class Friend {
 	
 		return returns;
 	}
+	
+	public String deleteFriend(String request_id, String target_id) {
+		System.out.println("내 아이디"+ request_id);
+		
+	  try {
+			conn = cDB.getConn();
+			
+			sql = "delete * from "+request_id+"friend where friend_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, target_id);
+			rs = pstmt.executeQuery();			
+			
+			sql = "delete * from "+target_id+"friend where friend_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, request_id);
+			rs = pstmt.executeQuery();		
+			
+			returns = "deleteFriendSuccess";
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println(e);
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs_sub != null)
+				try {
+					rs_sub.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+		}
+		
+		System.out.println(returns);
+	
+		return returns;
+	}
 		
 	public String getProfile(String id) {	
 		try {

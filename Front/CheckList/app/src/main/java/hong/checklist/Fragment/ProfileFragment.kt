@@ -12,18 +12,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import hong.checklist.*
 import hong.checklist.Adapter.FriendAdapter
-import hong.checklist.AddFriendActivity
 import hong.checklist.DB.*
 import hong.checklist.Data.FriendContents
-import hong.checklist.LoginActivity
-import hong.checklist.R
+import hong.checklist.Listener.MyButtonClickListener
 import kotlinx.android.synthetic.main.fragment_profile.*
 import org.json.JSONArray
 
@@ -80,6 +81,29 @@ class ProfileFragment : Fragment(){
             startActivity(intent)
         }
 
+        // 스와이프해서 수정, 삭제
+        val swipe = object : MySwipeHelper(context, recyclerView_profile_freindlist, 200){
+            override fun instantiateMyButton(
+                viewHolder: RecyclerView.ViewHolder,
+                buffer: MutableList<MyButton>
+            ) {
+                buffer.add(
+                    MyButton(context!!,
+                        "삭제",
+                        50,
+                        0,
+                        Color.parseColor("#FFFFFF"),
+                        object : MyButtonClickListener {
+                            override fun onClick(pos: Int) {
+                                friendVolley(requireContext(), "deleteFriend" ,url_friend, profileList[0].id ,friendList.get(pos).id)
+                                friendList.removeAt(pos)
+                                setRecyclerView(friendList)
+                            }
+                        })
+                )
+            }
+        }
+
         return view
     }
 
@@ -98,7 +122,7 @@ class ProfileFragment : Fragment(){
                     login_success = true
                     tv_name.setText(profileList[0].name)
                     tv_name.setTextColor(Color.parseColor("#000000"))
-                    friendVolley(requireContext(),url_friend, profileList[0].id )
+                    friendVolley(requireContext(), "getFriend" ,url_friend, profileList[0].id ,"")
                 }
             }
         }
@@ -108,8 +132,10 @@ class ProfileFragment : Fragment(){
 
     private fun friendVolley(
         context: Context,
+        type : String,
         url: String,
-        id: String
+        my_id: String,
+        friend_id: String
     ) {
 
         // 1. RequestQueue 생성 및 초기화
@@ -123,6 +149,9 @@ class ProfileFragment : Fragment(){
 
                 }
                 else if(response.equals("error")){
+
+                }
+                else if(response.equals("deleteFriendSuccess")){
 
                 }
                 else{
@@ -146,9 +175,9 @@ class ProfileFragment : Fragment(){
         ) {
             override fun getParams(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["type"] = "getFriend"
-                params["my_id"] = id
-                params["friend_id"] = ""
+                params["type"] = type
+                params["my_id"] = my_id
+                params["friend_id"] = friend_id
 
                 return params
             }

@@ -16,8 +16,10 @@ public class FriendCnt {
 		
 		if(type.equals("addFriend"))
 			addFriend(request_id, target_id);
-		else
+		else if(type.equals("getFriend"))
 			getFriend(request_id);
+		else if(type.equals("deleteFriend"))
+			deleteFriend(request_id, target_id);
 	
 	}
 	
@@ -27,6 +29,10 @@ public class FriendCnt {
 	
 	public void getFriend(String request_id) {
 		result = requestjsp.getFriend(request_id);
+	}
+	
+	public void deleteFriend(String request_id, String target_id) {
+		result = requestjsp.deleteFriend(request_id, target_id);
 	}
 	
 	public String getResult() {

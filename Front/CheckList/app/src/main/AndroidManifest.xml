@@ -46,6 +46,9 @@
         <activity android:name=".DateActivity">
         </activity>
 
+        <activity android:name=".OptionActivity">
+        </activity>
+
     </application>
 
 </manifest>

@@ -49,6 +49,13 @@ public class Login {
 					pstmt = conn.prepareStatement(sql);
 					pstmt.executeUpdate();	
 					
+					// id+weather 테이블 생성
+					sql = "create table "+id+"weather ("
+							+ "date varchar(10) primary key not null,"
+							+ "weather varchar(10) not null)";
+					pstmt = conn.prepareStatement(sql);
+					pstmt.executeUpdate();	
+					
 					// id+friend 테이블 생성
 					sql = "create table "+id+"friend ("
 							+ "friend_id varchar(30) not null)";
