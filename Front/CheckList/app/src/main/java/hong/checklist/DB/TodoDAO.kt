@@ -17,7 +17,6 @@ interface TodoDAO {
     @Query("SELECT * FROM todo WHERE date = :today")
     fun getContent(today: String) : List<TodoEntity>
 
-    @Delete
-    fun delete(todo : TodoEntity)
-
+    @Query("DELETE FROM todo")
+    fun deleteTodo()
 }

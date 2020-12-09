@@ -284,7 +284,6 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
     fun saveDB(goal : Int){
         // DB 저장
         val contentList : List<TodoContents> = todoList
-        Log.d("날씨 저장",weather.toString())
         val todo = TodoEntity(date, contentList ,weather,goal)
         setTodo(todo)
     }

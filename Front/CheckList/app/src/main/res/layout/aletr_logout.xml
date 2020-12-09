@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/alert_background">
+
+   <TextView
+       android:id="@+id/tv_logoutmessage"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:fontFamily="@font/uhbeeseulvely"
+       android:layout_marginTop="30dp"
+       android:layout_marginBottom="30dp"
+       android:text="로그아웃 하시겠습니까?"
+       android:textColor="@color/black"
+       android:textSize="20sp"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       />
+
+    <Button
+        android:id="@+id/btn_logoutback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:text="취소"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_logoutmessage"
+        app:layout_constraintEnd_toStartOf="@id/btn_logoutok"/>
+
+    <Button
+        android:id="@+id/btn_logoutok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:fontFamily="@font/uhbeeseulvely"
+        android:text="확인"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_logoutmessage"
+        app:layout_constraintStart_toEndOf="@id/btn_logoutback"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

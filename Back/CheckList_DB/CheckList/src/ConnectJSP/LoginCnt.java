@@ -23,6 +23,12 @@ public class LoginCnt {
 		else if(type.equals("join")) {
 			addProfile(id, password, name);
 		}
+		else if(type.equals("getTodo")) {
+			getTodo(id);
+		}
+		else if(type.equals("getWeather")) {
+			getWeather(id);
+		}
 	}
 	
 	
@@ -33,6 +39,14 @@ public class LoginCnt {
 	
 	public void addProfile(String id, String password,String name) {
 		result = loginjsp.addProfile(id,password,name);
+	}
+	
+	public void getTodo(String id) {
+		result = loginjsp.getTodo(id);
+	}
+	
+	public void getWeather(String id) {
+		result = loginjsp.getWeather(id);
 	}
 	
 	public String getResult() {

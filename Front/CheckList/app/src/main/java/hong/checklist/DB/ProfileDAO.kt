@@ -9,4 +9,7 @@ interface ProfileDAO {
 
     @Query("SELECT * FROM profile")
     fun getProfile() : List<ProfileEntity>
+
+    @Query("DELETE FROM profile")
+    fun deleteProfile()
 }

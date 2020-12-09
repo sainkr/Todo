@@ -45,7 +45,6 @@ class ProfileFragment : Fragment(){
 
     var friendList = ArrayList<FriendContents>()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -57,7 +56,9 @@ class ProfileFragment : Fragment(){
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
         var tv_name : TextView= view.findViewById(R.id.tv_name)
         var tv_freindadd : TextView = view.findViewById(R.id.tv_profile_freindadd)
+        var tv_option : TextView = view.findViewById(R.id.tv_option)
         val recyclerView_profile_freindlist: RecyclerView = view.findViewById(R.id.recyclerView_profile_freindlist)
+
         db = CheckListDatabase.getInstance(requireContext())!!
 
         val manager = LinearLayoutManager(context)
@@ -67,8 +68,6 @@ class ProfileFragment : Fragment(){
         getProfile()
 
         tv_name.setOnClickListener{
-            Log.d("로그인",login_success.toString())
-
             if(!login_success){
                 val intent = Intent(requireContext(), LoginActivity::class.java)
                 startActivityForResult(intent,REQUEST_CODE)
@@ -79,6 +78,17 @@ class ProfileFragment : Fragment(){
             val intent = Intent(requireContext(),AddFriendActivity::class.java)
             intent.putExtra("my_id",profileList[0].id)
             startActivity(intent)
+        }
+
+        tv_option.setOnClickListener {
+            val intent = Intent(requireContext(), OptionActivity::class.java)
+
+            if(login_success){
+                intent.putExtra("my_id",profileList[0].id)
+            }else{
+                intent.putExtra("my_id","none")
+            }
+            startActivityForResult(intent,REQUEST_CODE)
         }
 
         // 스와이프해서 수정, 삭제
@@ -123,6 +133,10 @@ class ProfileFragment : Fragment(){
                     tv_name.setText(profileList[0].name)
                     tv_name.setTextColor(Color.parseColor("#000000"))
                     friendVolley(requireContext(), "getFriend" ,url_friend, profileList[0].id ,"")
+                }
+                else{
+                    login_success = false
+                    tv_name.setText("로그인")
                 }
             }
         }
@@ -190,11 +204,11 @@ class ProfileFragment : Fragment(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        getProfile()
+
         if(requestCode == REQUEST_CODE){
             if(resultCode != Activity.RESULT_OK)
                 return
-
-            getProfile()
         }
     }
 

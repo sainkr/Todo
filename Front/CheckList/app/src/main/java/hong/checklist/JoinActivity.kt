@@ -64,7 +64,7 @@ class JoinActivity : AppCompatActivity(){
                 params["id"] = id
                 params["password"] = password
                 params["name"] = name // 로그인하는 휴대폰번호 정보
-                // params["uID"] = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
                 return params
             }
         }

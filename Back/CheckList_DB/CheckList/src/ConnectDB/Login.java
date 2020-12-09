@@ -43,7 +43,7 @@ public class Login {
 					
 					// id+todo 테이블 생성
 					sql = "create table "+id+"todo ("
-							+ "date varchar(10) not null,"
+							+ "date varchar(100) not null,"
 							+ "todo varchar(1000) not null,"
 							+ "todo_check int not null )";
 					pstmt = conn.prepareStatement(sql);
@@ -51,8 +51,8 @@ public class Login {
 					
 					// id+weather 테이블 생성
 					sql = "create table "+id+"weather ("
-							+ "date varchar(10) primary key not null,"
-							+ "weather varchar(10) not null)";
+							+ "date varchar(100) primary key not null,"
+							+ "weather int not null)";
 					pstmt = conn.prepareStatement(sql);
 					pstmt.executeUpdate();	
 					
@@ -134,34 +134,141 @@ public class Login {
 				rs = pstmt.executeQuery();	
 				
 				returns = name;
-				
-				/*
-				 * JSONArray jary = new JSONArray();
-				while(rs.next()) {
-					JSONObject jobj = new JSONObject();
-					
-					sql = "select * from profile where id = ? ";
-					pstmt = conn.prepareStatement(sql);
-					pstmt.setString(1, rs.getString("friend_id"));
-					rs_sub = pstmt.executeQuery();	
-					
-					if(rs_sub.next()) {
-						jobj.put("friend_id",rs.getString("friend_id"));
-						jobj.put("friend_name",rs_sub.getString("name"));
-						jary.add(jobj);
-					}
-					
-				}
-				
-				if(jary.size() > 0)
-					returns = jary.toJSONString()+"닉네임"+name;
-				else {
-					returns = "loginSuccess "+name;
-				}*/
-	
 			}
 			else
 				returns = "loginFail";
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println(e);
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs_sub != null)
+				try {
+					rs_sub.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+		}
+		
+		System.out.println(returns);
+		
+	return returns;
+	}
+	
+	public String getTodo(String id) {	
+		try {
+			System.out.println("id : " + id);
+			conn = cDB.getConn();
+			sql = "select * from "+id+"todo order by date desc";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();		
+
+			JSONArray jary = new JSONArray();
+			
+			while(rs.next()) {
+				JSONObject jobj = new JSONObject();
+				
+				jobj.put("date",rs.getString("date"));
+				jobj.put("content",rs.getString("todo"));
+				jobj.put("check",rs.getInt("todo_check"));
+				
+				System.out.println(rs.getString("date"));
+				
+				jary.add(jobj);
+			}
+			
+			if(jary.size() == 0)
+				returns = "todoNoting";
+			else
+				returns = jary.toJSONString();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println(e);
+			returns = "error";
+		} finally {
+			if (pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (conn != null)
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs != null)
+				try {
+					rs.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+			if (rs_sub != null)
+				try {
+					rs_sub.close();
+				} catch (SQLException ex) {
+					System.err.println("Login SQLException error");
+					returns = "error";
+				}
+		}
+		
+		System.out.println(returns);
+		
+	return returns;
+	}
+	
+	public String getWeather(String id) {	
+		try {
+			System.out.println("id : " + id);
+			conn = cDB.getConn();
+			sql = "select * from "+id+"weather";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();		
+
+			JSONArray jary = new JSONArray();
+			
+			while(rs.next()) {
+				JSONObject jobj = new JSONObject();
+				
+				jobj.put("date",rs.getString("date"));
+				jobj.put("weather",rs.getInt("weather"));
+	
+				jary.add(jobj);
+			}
+			
+			if(jary.size() == 0)
+				returns = "weatherNoting";
+			else
+				returns = jary.toJSONString();
 			
 			
 		} catch (SQLException e) {
