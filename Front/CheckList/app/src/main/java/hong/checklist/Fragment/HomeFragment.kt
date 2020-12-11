@@ -258,6 +258,7 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
             override fun onPostExecute(result: Unit?) {
                 super.onPostExecute(result)
                 if(todoentityList.size > 0){
+                    Log.d("저장","0")
                     val list = todoentityList[0].contentList
                     weather = todoentityList[0].weather
 
@@ -268,6 +269,7 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
                     if(list!= null){
                         var count = list.size - 1
                         for(i in 0..count) {
+                            Log.d("저장",list[i].content)
                             todoList.add(TodoContents(list[i].content, list[i].check))
                             if(list[i].check == 1)
                                 check_count++

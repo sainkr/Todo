@@ -25,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
     lateinit var db : CheckListDatabase
     var todoentityList = listOf<TodoEntity>()
+    var todoList = ArrayList<TodoContents>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,45 +67,17 @@ class LoginActivity : AppCompatActivity() {
         insertTask.execute()
     }
 
-    fun setTodo(todo : TodoEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
+    fun setTodo(date : String , contentList : List<TodoContents>, weather:Int){
+        val insertTodoTask = object : AsyncTask<Unit, Unit, Unit>() {
             override fun doInBackground(vararg p0: Unit?) {
-                Log.d("아놔",todo.date)
-                db.todoDAO().insert(todo)
+                for(i in 0 until contentList.size){
+                    Log.d("출력",contentList.get(i).content)
+                }
+                db.todoDAO().insert(TodoEntity(date,contentList,weather,0))
             }
         }
 
-        insertTask.execute()
-    }
-
-    fun getAllTodos(todoEntity : TodoEntity){
-        val getTask = object : AsyncTask<Unit, Unit, Unit>(){
-            override fun doInBackground(vararg p0: Unit?) {
-                todoentityList = db.todoDAO().getContent(todoEntity.date)
-            }
-            // insert 한 후에
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if(todoentityList.size > 0){
-                    Log.d("진입1","1")
-                    val list1 = todoentityList[0].contentList
-                    var todoList = ArrayList<TodoContents>()
-                    for(i in 0 until list1!!.size)
-                        todoList.add(list1.get(i))
-                    val list2 =todoEntity.contentList
-                    for(i in 0 until list2!!.size)
-                        todoList.add(list2.get(i))
-                    val contentList : List<TodoContents> = todoList
-                    setTodo(TodoEntity(todoEntity.date, contentList ,todoentityList[0].weather,0))
-                }
-                else{
-                    Log.d("진입2","2")
-                    setTodo(todoEntity)
-                }
-            }
-        }
-
-        getTask.execute()
+        insertTodoTask.execute()
     }
 
     fun getWeather(date: String, weather : Int){
@@ -117,13 +90,13 @@ class LoginActivity : AppCompatActivity() {
                 super.onPostExecute(result)
                 if(todoentityList.size > 0){
                     if(todoentityList[0].weather == -1){
-                        setTodo(TodoEntity(date, todoentityList[0].contentList ,weather,0))
+                        todoentityList[0].contentList?.let { setTodo(date, it,weather) }
                     }
                 }
                 else{
                     var todoList = ArrayList<TodoContents>()
                     val contentList : List<TodoContents> = todoList
-                    setTodo(TodoEntity(date, contentList, weather ,0))
+                    setTodo(date, contentList, weather)
                 }
             }
         }
@@ -160,6 +133,7 @@ class LoginActivity : AppCompatActivity() {
                             val intentR = intent
                             setResult(RESULT_OK,intentR); //결과를 저장
                             finish()
+
                         }
             },
             Response.ErrorListener { error ->
@@ -205,29 +179,43 @@ class LoginActivity : AppCompatActivity() {
 
                     val jsonObject = jarray.getJSONObject(0)
                     var date0 = jsonObject.getString("date")
-                    var todoList = ArrayList<TodoContents>()
+                    val content0 = jsonObject.getString("content")
+                    val check0 = jsonObject.getInt("check")
+
+                    todoList.add(TodoContents(content0,check0))
 
                     for (i in 1 until size) {
 
-                        val jsonObject = jarray.getJSONObject(0)
+                        val jsonObject = jarray.getJSONObject(i)
                         val date = jsonObject.getString("date")
                         val content = jsonObject.getString("content")
                         val check = jsonObject.getInt("check")
+                        val weather = jsonObject.getInt("weather")
 
+                        Log.d("사이즈", todoList.size.toString())
                         if(date0.equals(date)){
+                            Log.d("내용1",date+" "+content+" "+check)
                             todoList.add(TodoContents(content,check))
+                            if(i == size - 1){
+                                val contentList : List<TodoContents> = todoList
+
+                                setTodo(date0, contentList , weather)
+                                todoList.clear()
+                            }
                         }else{
+                            Log.d("내용2",date+" "+content+" "+check)
                             val contentList : List<TodoContents> = todoList
+                            for(i in 0 until contentList.size){
+                                Log.d("출력",contentList.get(i).content)
+                            }
+                            setTodo(date0, contentList , weather)
                             todoList.clear()
-                            getAllTodos(TodoEntity(date0, contentList, -1, 0))
+                            todoList.add(TodoContents(content,check))
                             date0 = date
                         }
 
-                        Log.d("내용",date+" "+content+" "+check)
-
-
                     }
-                    getWeatherVolley( this, url_login, id)
+                    // getWeatherVolley( this, url_login, id)
                 }
             },
             Response.ErrorListener { error ->
@@ -248,13 +236,11 @@ class LoginActivity : AppCompatActivity() {
         requestQueue.add(request)
     }
 
-
     private fun getWeatherVolley(
         context: Context,
         url: String,
         id: String
     ) {
-
         // 1. RequestQueue 생성 및 초기화
         var requestQueue = Volley.newRequestQueue(context)
 

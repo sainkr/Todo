@@ -196,7 +196,17 @@ public class Login {
 				jobj.put("content",rs.getString("todo"));
 				jobj.put("check",rs.getInt("todo_check"));
 				
-				System.out.println(rs.getString("date"));
+				conn = cDB.getConn();
+				sql = "select * from "+id+"weather where date = ?";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, rs.getString("date"));
+				rs_sub = pstmt.executeQuery();		
+
+				if(rs_sub.next()) {
+					jobj.put("weather",rs_sub.getInt("weather"));
+				}else {
+					jobj.put("weather",-1);
+				}
 				
 				jary.add(jobj);
 			}
