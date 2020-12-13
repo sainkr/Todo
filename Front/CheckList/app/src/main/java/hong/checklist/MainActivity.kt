@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import hong.checklist.Fragment.CalenderFragment
+import hong.checklist.Fragment.CalendarFragment
 import hong.checklist.Fragment.ChallengeFragment
 import hong.checklist.Fragment.HomeFragment
 import hong.checklist.Fragment.ProfileFragment
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
             R.id.calendar->{
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.frame_layout, CalenderFragment(this))
+                transaction.replace(R.id.frame_layout, CalendarFragment(this))
                 transaction.commit()
                 return true
             }

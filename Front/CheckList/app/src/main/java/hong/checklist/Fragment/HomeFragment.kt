@@ -25,12 +25,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import hong.checklist.*
 import hong.checklist.Adapter.TodoAdapter
 import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.TodoContents
 import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.MyButtonClickListener
+import org.json.JSONArray
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -52,6 +56,8 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
     var check_count = 0
 
     var weatherarr = arrayOf("날씨 : 맑음","날씨 : 흐림","날씨 : 비","날씨 : 눈")
+
+    val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -258,7 +264,6 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
             override fun onPostExecute(result: Unit?) {
                 super.onPostExecute(result)
                 if(todoentityList.size > 0){
-                    Log.d("저장","0")
                     val list = todoentityList[0].contentList
                     weather = todoentityList[0].weather
 
@@ -269,7 +274,6 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
                     if(list!= null){
                         var count = list.size - 1
                         for(i in 0..count) {
-                            Log.d("저장",list[i].content)
                             todoList.add(TodoContents(list[i].content, list[i].check))
                             if(list[i].check == 1)
                                 check_count++

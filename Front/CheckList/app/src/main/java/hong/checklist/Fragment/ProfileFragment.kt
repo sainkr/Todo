@@ -137,6 +137,7 @@ class ProfileFragment : Fragment(){
                 else{
                     login_success = false
                     tv_name.setText("로그인")
+                    tv_name.setTextColor(Color.parseColor("#1E88E5"))
                 }
             }
         }
