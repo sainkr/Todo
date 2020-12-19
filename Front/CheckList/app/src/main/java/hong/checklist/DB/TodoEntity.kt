@@ -14,8 +14,5 @@ data class TodoEntity (
     var contentList: List<TodoContents> ?= null,
 
     @ColumnInfo(name = "weather")
-    var weather : Int,
-
-    @ColumnInfo(name = "goal")
-    var goal : Int
+    var weather : Int
 )

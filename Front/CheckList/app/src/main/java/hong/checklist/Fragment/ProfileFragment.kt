@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
@@ -26,15 +27,12 @@ import hong.checklist.DB.*
 import hong.checklist.Data.FriendContents
 import hong.checklist.Listener.MyButtonClickListener
 import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
-
-@SuppressLint("StaticFieldLeak")
 class ProfileFragment : Fragment(){
-
-    // 놓친 부분
-    // 1. 친구 닉네임 동기화.
-    // 2. 친구 삭제
 
     lateinit var db : CheckListDatabase
     var profileList = listOf<ProfileEntity>()
@@ -122,27 +120,25 @@ class ProfileFragment : Fragment(){
     }
 
     fun getProfile(){
-        val getTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                profileList = db.profileDAO().getProfile()
-            }
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if(profileList.size > 0){
-                    login_success = true
+        lifecycleScope.launch(Dispatchers.IO){
+            profileList = db.profileDAO().getProfile()
+
+            if(profileList.size > 0){
+                login_success = true
+                withContext(Dispatchers.Main){
                     tv_name.setText(profileList[0].name)
                     tv_name.setTextColor(Color.parseColor("#000000"))
                     friendVolley(requireContext(), "getFriend" ,url_friend, profileList[0].id ,"")
                 }
-                else{
-                    login_success = false
+            }
+            else{
+                login_success = false
+                withContext(Dispatchers.Main){
                     tv_name.setText("로그인")
                     tv_name.setTextColor(Color.parseColor("#1E88E5"))
                 }
             }
         }
-
-        getTask.execute()
     }
 
     private fun friendVolley(

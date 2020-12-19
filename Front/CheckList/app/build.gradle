@@ -41,12 +41,12 @@ dependencies {
 
     // Room Database
     def room_version = "2.2.5"
-
     implementation "androidx.room:room-runtime:$room_version"
+
     kapt "androidx.room:room-compiler:$room_version"
 
     implementation 'com.google.code.gson:gson:2.8.6' // Gson
-
     implementation 'com.android.volley:volley:1.1.0' // Volley
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0" // corutin
 
 }

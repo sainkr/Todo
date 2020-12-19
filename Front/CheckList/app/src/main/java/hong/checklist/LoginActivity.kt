@@ -8,11 +8,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import hong.checklist.DB.*
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 
@@ -53,24 +56,17 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun insertProfile(profile: ProfileEntity) {
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.profileDAO().insert(profile)
-
-            }
+        lifecycleScope.launch(Dispatchers.IO) { // Dispatchers.IO : 백그라운드 실행
+            db.profileDAO().insert(profile)
         }
-        insertTask.execute()
     }
 
     fun setTodo(todo : TodoEntity){
-        val insertTodoTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.todoDAO().insert(todo)
-            }
+        lifecycleScope.launch(Dispatchers.IO){ // Dispatchers.IO : 백그라운드 실행
+            db.todoDAO().insert(todo)
         }
-
-        insertTodoTask.execute()
     }
+
     private fun loginVolley(
         context: Context,
                 url: String,
@@ -126,7 +122,6 @@ class LoginActivity : AppCompatActivity() {
         url: String,
         id: String
     ) {
-
         // 1. RequestQueue 생성 및 초기화
         var requestQueue = Volley.newRequestQueue(context)
 
@@ -156,7 +151,7 @@ class LoginActivity : AppCompatActivity() {
 
 
                     if(size == 1)
-                        setTodo(TodoEntity(date0,todoList,weather0,0))
+                        setTodo(TodoEntity(date0,todoList,weather0))
                     else{
                         for (i in 1 until size) {
                             val jsonObject = jarray.getJSONObject(i)
@@ -172,14 +167,14 @@ class LoginActivity : AppCompatActivity() {
                                     for(j in 0 until todoList.size){
                                         contentList.add(TodoContents(todoList[j].content,todoList[j].check))
                                     }
-                                    setTodo(TodoEntity(date,contentList,weather,0))
+                                    setTodo(TodoEntity(date,contentList,weather))
                                 }
                             }else{
                                 var contentList = ArrayList<TodoContents>()
                                 for(j in 0 until todoList.size){
                                     contentList.add(TodoContents(todoList[j].content,todoList[j].check))
                                 }
-                                setTodo(TodoEntity(date0,contentList,weather,0))
+                                setTodo(TodoEntity(date0,contentList,weather))
                                 todoList.clear()
                                 todoList.add(TodoContents(content,check))
 

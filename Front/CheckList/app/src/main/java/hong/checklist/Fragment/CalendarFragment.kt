@@ -22,7 +22,7 @@ import hong.checklist.Listener.OnDateClickListener
 import kotlinx.android.synthetic.main.fragment_calendar.*
 
 @SuppressLint("StaticFieldLeak")
-class CalendarFragment(context: Context) : Fragment(), OnDateClickListener {
+class CalendarFragment() : Fragment(), OnDateClickListener {
 
     lateinit var db : CheckListDatabase
     var todoentityList = listOf<TodoEntity>()

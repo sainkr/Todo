@@ -23,6 +23,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
@@ -34,6 +35,10 @@ import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.TodoContents
 import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.MyButtonClickListener
+import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
 import java.time.LocalDateTime
@@ -41,8 +46,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
-@SuppressLint("StaticFieldLeak")
-class HomeFragment(context: Context) : Fragment(), OnCheckListener {
+
+class HomeFragment() : Fragment(), OnCheckListener {
 
     lateinit var db : CheckListDatabase
     var todoentityList = listOf<TodoEntity>()
@@ -57,11 +62,8 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
 
     var weatherarr = arrayOf("날씨 : 맑음","날씨 : 흐림","날씨 : 비","날씨 : 눈")
 
-    val url_login = "http://192.168.35.76:8080/CheckList/Login.jsp"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -150,7 +152,6 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
                         Color.parseColor("#FFFFFF"),
                         object : MyButtonClickListener {
                             override fun onClick(pos: Int) {
-
                                 todoList.removeAt(pos)
                                 setRecyclerView(todoList)
                                 et_today_todo.setText("")
@@ -246,31 +247,24 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
     }
 
     fun setTodo(todo : TodoEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.todoDAO().insert(todo)
-            }
+        lifecycleScope.launch(Dispatchers.IO){ // Dispatchers.IO : 백그라운드 실행
+            db.todoDAO().insert(todo)
         }
-
-        insertTask.execute()
     }
 
     fun getAllTodos(today: String){
-        val getTask = object : AsyncTask<Unit, Unit, Unit>(){
-            override fun doInBackground(vararg p0: Unit?) {
-                todoentityList = db.todoDAO().getContent(today)
-            }
-            // insert 한 후에
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if(todoentityList.size > 0){
-                    val list = todoentityList[0].contentList
-                    weather = todoentityList[0].weather
 
+        lifecycleScope.launch(Dispatchers.IO){
+            todoentityList = db.todoDAO().getContent(today)
+
+            if(todoentityList.size > 0){
+                val list = todoentityList[0].contentList
+                weather = todoentityList[0].weather
+
+                withContext(Dispatchers.Main){
                     // 날씨 설정
                     if(weather > -1)
                         tv_weather.setText(weatherarr[weather])
-
                     if(list!= null){
                         var count = list.size - 1
                         for(i in 0..count) {
@@ -283,14 +277,12 @@ class HomeFragment(context: Context) : Fragment(), OnCheckListener {
                 }
             }
         }
-
-        getTask.execute()
     }
 
     fun saveDB(goal : Int){
         // DB 저장
         val contentList : List<TodoContents> = todoList
-        val todo = TodoEntity(date, contentList ,weather,goal)
+        val todo = TodoEntity(date, contentList ,weather)
         setTodo(todo)
     }
 

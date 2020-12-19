@@ -192,6 +192,4 @@ abstract class MySwipeHelper(
             right = left
         }
     }
-
-
 }

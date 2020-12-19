@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
@@ -24,10 +25,15 @@ import hong.checklist.ChallengeMemberActivity
 import hong.checklist.ChallengeAddActivity
 import hong.checklist.DB.CheckListDatabase
 import hong.checklist.DB.ProfileEntity
+import hong.checklist.DB.TodoContents
 import hong.checklist.Data.ChallengeContents
 import hong.checklist.Listener.OnChallengeTouchListener
 import hong.checklist.R
 import kotlinx.android.synthetic.main.fragment_challenge.*
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
 @SuppressLint("StaticFieldLeak")
@@ -100,20 +106,13 @@ class ChallengeFragment : Fragment(), OnChallengeTouchListener {
     }
 
     fun getProfile() {
-        val getTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                profileList = db.profileDAO().getProfile()
-            }
-
-            override fun onPostExecute(result: Unit?) {
-                super.onPostExecute(result)
-                if (profileList.size > 0) {
-                    my_id = profileList.get(0).id
-                    getChallengeVolley(requireContext(), url_challengetodo, my_id)
-                }
+        lifecycleScope.launch(Dispatchers.IO){
+            profileList = db.profileDAO().getProfile()
+            if (profileList.size > 0) {
+                my_id = profileList.get(0).id
+                getChallengeVolley(requireContext(), url_challengetodo, my_id)
             }
         }
-        getTask.execute()
     }
 
     private fun getChallengeVolley(

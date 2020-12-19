@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import hong.checklist.Adapter.TodoAdapter
@@ -24,6 +25,8 @@ import hong.checklist.DB.TodoEntity
 import hong.checklist.Listener.MyButtonClickListener
 import hong.checklist.Listener.OnCheckListener
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -214,13 +217,9 @@ class DateActivity : AppCompatActivity(), OnCheckListener {
     }
 
     fun setTodo(todo : TodoEntity){
-        val insertTask = object : AsyncTask<Unit, Unit, Unit>() {
-            override fun doInBackground(vararg p0: Unit?) {
-                db.todoDAO().insert(todo)
-            }
+        lifecycleScope.launch(Dispatchers.IO){ // Dispatchers.IO : 백그라운드 실행
+            db.todoDAO().insert(todo)
         }
-
-        insertTask.execute()
     }
 
     fun getAllTodos(today: String){
@@ -259,7 +258,7 @@ class DateActivity : AppCompatActivity(), OnCheckListener {
         // DB 저장
         val contentList : List<TodoContents> = todoList
         Log.d("날씨 저장",weather.toString())
-        val todo = TodoEntity(date, contentList ,weather,goal)
+        val todo = TodoEntity(date, contentList ,weather)
         setTodo(todo)
     }
 

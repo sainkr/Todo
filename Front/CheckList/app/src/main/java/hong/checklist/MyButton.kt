@@ -39,7 +39,6 @@ class MyButton(private val context: Context, private val text: String,
         // Text
         p.color = Color.BLACK
         p.textSize = textSize.toFloat()
-
         p.typeface = Typeface.createFromAsset(context.getAssets(),"uhbeeseulvely.ttf")
 
         val r = Rect()
@@ -47,7 +46,7 @@ class MyButton(private val context: Context, private val text: String,
         val cWidth = rectF.width()
         p.textAlign = Paint.Align.LEFT
         p.getTextBounds(text,0,text.length,r)
-        var x= 0f
+        var x = 0f
         var y = 0f
         if(imageResID == 0){
             x = cWidth / 2f - r.width() / 2f - r.left.toFloat()

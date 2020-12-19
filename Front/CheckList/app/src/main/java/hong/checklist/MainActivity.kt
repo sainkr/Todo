@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         bottom_navigation.setOnNavigationItemSelectedListener(this)
 
        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.frame_layout, HomeFragment(this))
+        transaction.replace(R.id.frame_layout, HomeFragment())
         transaction.commit()
 
         bottom_navigation.itemIconTintList = null
@@ -31,14 +31,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         when(item.itemId){
             R.id.home->{
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.frame_layout, HomeFragment(this))
+                transaction.replace(R.id.frame_layout, HomeFragment())
                 transaction.commit()
                 return true
             }
 
             R.id.calendar->{
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.frame_layout, CalendarFragment(this))
+                transaction.replace(R.id.frame_layout, CalendarFragment())
                 transaction.commit()
                 return true
             }

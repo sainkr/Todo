@@ -2,23 +2,14 @@ package hong.checklist
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import hong.checklist.DB.CheckListDatabase
-import hong.checklist.DB.FriendEntity
-import hong.checklist.DB.ProfileEntity
 import kotlinx.android.synthetic.main.activity_addfrined.*
-import kotlinx.android.synthetic.main.activity_login.*
-import org.json.JSONArray
-import org.json.JSONException
 
 @SuppressLint("StaticFieldLeak")
 class AddFriendActivity : AppCompatActivity() {
