@@ -5,8 +5,7 @@
 - FrontEnd 개발 환경 : Kotlin, Android
 - BackEnd 개발 환경 : JSP, Java, MySQL, Apacheomcat, eclipse
 
-- 소개
-+ 오늘 할일, 달력 확인, 친구들과 챌린지를 할 수 있는 어플리케이션
+- 소개 : 오늘 할일, 달력 확인, 친구들과 챌린지를 할 수 있는 어플리케이션
 
 ## 기능
 + 회원가입
